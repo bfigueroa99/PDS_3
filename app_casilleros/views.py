@@ -1,9 +1,28 @@
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Casillero, Reserva, ApiKey
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
 
+
+class ApiKeyAuthentication(BaseAuthentication):
+    def authenticate(self, request):
+        api_key = request.data.get('api_key')
+        if api_key:
+            try:
+                api_key_obj = ApiKey.objects.get(key=api_key)
+                return (api_key_obj.usuario, None)
+            except ApiKey.DoesNotExist:
+                raise AuthenticationFailed('API key inválida')
+        return None
+
+class MyApiView(APIView):
+    authentication_classes = [ApiKeyAuthentication]  # Utiliza tu autenticación personalizada
+    permission_classes = [IsAuthenticated]  # Puedes agregar permisos según tus necesidades
 class CasilleroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Casillero
