@@ -1,4 +1,4 @@
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,6 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from .serializers import CasilleroSerializer
 
 
 class ApiKeyAuthentication(BaseAuthentication):
@@ -23,18 +24,15 @@ class ApiKeyAuthentication(BaseAuthentication):
         return None
 
 class MyApiView(APIView):
-    authentication_classes = [ApiKeyAuthentication]  # Utiliza tu autenticación personalizada
-    permission_classes = [IsAuthenticated]  # Puedes agregar permisos según tus necesidades
-class CasilleroSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Casillero
-        fields = ['id', 'tamano', 'disponible']
+    authentication_classes = [ApiKeyAuthentication] 
+    permission_classes = [IsAuthenticated] 
 
 @api_view(['GET'])
 def casilleros_disponibles(request):
     casilleros = Casillero.objects.filter(disponible=True)
     serializer = CasilleroSerializer(casilleros, many=True)
-    return Response(serializer.data)
+    context = {'casilleros': serializer.data}
+    return render(request, 'casilleros_disponibles.html', context)
 
 @api_view(['GET'])
 def casillero_detalle(request, pk):
@@ -127,11 +125,9 @@ def home_view(request):
     return render(request, 'home.html', context)
 
 def obtener_reservas_usuario(request, usuario_id):
-    # Suponemos que tienes un modelo Usuario en tu aplicación
     usuario = User.objects.get(id=usuario_id)
     reservas = Reserva.objects.filter(usuario=usuario)
 
-    # Ahora construimos una lista de reservas en formato JSON
     reservas_json = []
     for reserva in reservas:
         reservas_json.append({
