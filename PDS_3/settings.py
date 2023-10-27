@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'app_casilleros.apps.AppCasillerosConfig',
     'app_casilleros',
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

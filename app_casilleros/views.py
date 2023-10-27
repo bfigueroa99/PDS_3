@@ -49,7 +49,7 @@ def casillero_detalle(request, pk):
     serializer = CasilleroSerializer(casillero)
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def reservar_casillero(request):
     api_key = request.data.get('api_key')
     casillero_id = request.data.get('casillero_id')
@@ -65,7 +65,7 @@ def reservar_casillero(request):
     reserva.save()
     casillero.disponible = False
     casillero.save()
-    return Response({'success': 'Reserva realizada con éxito'})
+    return render(request, 'reservar_casillero.html')
 
 @api_view(['POST'])
 def confirmar_reserva(request):
