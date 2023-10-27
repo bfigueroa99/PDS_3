@@ -28,11 +28,17 @@ class MyApiView(APIView):
     permission_classes = [IsAuthenticated] 
 
 @api_view(['GET'])
-def casilleros_disponibles(request):
+def casilleros_lista(request):
     casilleros = Casillero.objects.filter(disponible=True)
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
     return render(request, 'casilleros_disponibles.html', context)
+
+@api_view(['GET'])
+def casilleros_disponibles(request):
+    casilleros = Casillero.objects.filter(disponible=True)
+    serializer = CasilleroSerializer(casilleros, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def casillero_detalle(request, pk):
