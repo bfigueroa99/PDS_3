@@ -8,6 +8,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 
 class ApiKeyAuthentication(BaseAuthentication):
@@ -119,8 +120,11 @@ def estado_reserva(request):
     }
     return Response(data)
 
+@login_required
 def home_view(request):
-    return render(request, 'home.html')
+    user = request.user
+    context = {'user_name': user.username}
+    return render(request, 'home.html', context)
 
 def obtener_reservas_usuario(request, usuario_id):
     # Suponemos que tienes un modelo Usuario en tu aplicación

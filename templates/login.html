@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+
+    <!-- Include your locally stored Bootstrap CSS file -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+    {% block content %}
+    <div class="container mt-5">
+        <h2 class="text-center">Iniciar sesión</h2>
+        <form method="post" class="col-md-6 offset-md-3">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary btn-block mt-3">Iniciar sesión</button>
+        </form>
+    </div>
+    {% endblock %}
+
+    <!-- Include Bootstrap JavaScript (from CDN) -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

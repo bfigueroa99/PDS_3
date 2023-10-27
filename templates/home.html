@@ -1,10 +1,14 @@
+{% extends 'navbar.html' %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Welcome to Home</title>
 </head>
 <body>
-    <h1>Welcome to the Home Page</h1>
+    {% block content %}
+    <h1>Welcome to the Home Page {{ user_name }}</h1>
     <p>This is your home page content.</p>
+    {% endblock %}
 </body>
 </html>

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-!f1)872*#rk6ceinbbi2#(y9k192d)8ows^y!zofi%xx$&dy)&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["161.35.0.111"]
 
 
 # Application definition
@@ -133,3 +133,6 @@ REST_FRAMEWORK = {
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PDS_3.settings")
 
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
