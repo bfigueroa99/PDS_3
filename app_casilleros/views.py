@@ -53,7 +53,7 @@ def casillero_detalle(request, pk):
 def reservar_casillero(request):
     user = request.user
     api_key = obtener_api_key(user)
-    casillero_id = request.data.get('casillero_id')
+    casillero_id = 4
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
