@@ -2,12 +2,13 @@ from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from .models import Casillero, Reserva, ApiKey, User
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 
 class ApiKeyAuthentication(BaseAuthentication):
@@ -118,6 +119,12 @@ def estado_reserva(request):
         'fecha_cancelacion': reserva.fecha_cancelacion,
     }
     return Response(data)
+
+@login_required
+def home_view(request):
+    user = request.user
+    context = {'user_name': user.username}
+    return render(request, 'home.html', context)
 
 def obtener_reservas_usuario(request, usuario_id):
     # Suponemos que tienes un modelo Usuario en tu aplicación
