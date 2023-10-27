@@ -35,7 +35,7 @@ def casilleros_lista(request):
     casilleros = Casillero.objects.filter(disponible=True)
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
-    return render(request, 'casilleros_disponibles.html', context)
+    return render(request, 'casilleros_lista.html', context)
 
 @api_view(['GET'])
 def casilleros_disponibles(request):
