@@ -1,0 +1,28 @@
+{% extends 'navbar.html' %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Lockers</title>
+</head>
+<body>
+    {% block content %}
+    <div style="padding-left: 20px;">
+        <br><h1>Available Lockers</h1><br>
+
+        <ul>
+            {% for casillero in casilleros %}
+                <li>
+                    Locker ID: {{ casillero.id }}<br>
+                    Size: {{ casillero.tamano }}<br>
+                    Status: Available
+                </li>
+                <hr>
+            {% empty %}
+                <p>No available lockers found.</p>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endblock %}
+</body>
+</html>
