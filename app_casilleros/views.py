@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .serializers import CasilleroSerializer
-
+#a
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
