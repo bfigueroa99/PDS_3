@@ -7,8 +7,11 @@
 </head>
 <body>
     {% block content %}
-    <h1>Welcome to the Home Page {{ user_name }}</h1>
-    <p>This is your home page content.</p>
+    <br><h1 style="text-align: center;">Welcome to the Home Page {{ user_name }}</h1>
+    <div style="padding-left: 20px;">
+        <p>This is your home page content.</p><br>
+        <a href="{% url 'casilleros_disponibles' %}" class="btn btn-primary">View Available Casilleros</a>
+    </div>
     {% endblock %}
 </body>
 </html>

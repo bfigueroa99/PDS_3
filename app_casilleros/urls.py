@@ -17,4 +17,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('obtener_api_key/', views.obtener_api_key_usuario, name='obtener_api_key_usuario'),
     
+
 ]
