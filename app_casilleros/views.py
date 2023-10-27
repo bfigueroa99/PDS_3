@@ -9,6 +9,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from .utils import obtener_api_key
+
+
 from .serializers import CasilleroSerializer
 #a
 
@@ -147,4 +150,14 @@ def obtener_reservas_usuario(request, usuario_id):
         })
 
     return JsonResponse({'reservas': reservas_json})
+
+@login_required
+def obtener_api_key_usuario(request):
+    usuario = request.user
+    api_key = obtener_api_key(usuario)
+    if api_key:
+        print(api_key)
+        return JsonResponse({'api_key': api_key})
+    else:
+        return JsonResponse({'message': 'API key no encontrada'})
 

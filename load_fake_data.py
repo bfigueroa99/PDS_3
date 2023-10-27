@@ -14,7 +14,7 @@ fake = Faker()
 for _ in range(10):
     username = fake.user_name()
     email = fake.email()
-    password = fake.password()
+    password = "hola123"
     user = User.objects.create_user(username=username, email=email, password=password)
 
 # Ejemplo para crear casilleros
