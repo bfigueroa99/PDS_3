@@ -32,16 +32,17 @@ class MyApiView(APIView):
 
 @api_view(['GET'])
 def casilleros_lista(request):
-    casilleros = Casillero.objects.filter(disponible=True)
+    casilleros = Casillero.objects.all()  # Obtener todos los casilleros sin filtrar
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
     return render(request, 'casilleros_lista.html', context)
 
 @api_view(['GET'])
 def casilleros_disponibles(request):
-    casilleros = Casillero.objects.filter(disponible=True)
+    casilleros = Casillero.objects.all()  # Obtener todos los casilleros sin filtrar
     serializer = CasilleroSerializer(casilleros, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def casillero_detalle(request, pk):
@@ -79,6 +80,46 @@ def reservar_casillero(request):
 
     context = {'casillero_id': casillero_id}    
     return render(request, 'reservar_casillero.html', context)
+
+
+from django.http import JsonResponse
+
+# ... (otras importaciones)
+
+
+@login_required
+# @api_view(['POST'])
+def liberar_casillero(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    api_key = obtener_api_key(user)
+    casillero_id = None
+    
+    if request.method == 'POST':
+        casillero_id = request.POST.get('casillero_id')
+    
+    try:
+        api_key_obj = ApiKey.objects.get(key=api_key)
+    except ApiKey.DoesNotExist:
+        return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    if casillero_id is not None:
+        try:
+            reserva = Reserva.objects.get(casillero__id=casillero_id, usuario=user)
+            casillero = reserva.casillero
+            casillero.disponible = True
+            casillero.save()
+            reserva.delete()  # Esto elimina la reserva correspondiente al usuario
+        except Reserva.DoesNotExist:
+            return Response({'error': 'Casillero no reservado por el usuario'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({'success': 'Casillero liberado'})
+    else:
+        return Response({'error': 'No se proporcionó el ID del casillero'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
