@@ -7,9 +7,11 @@
 </head>
 <body>
     {% block content %}
-    <h1 style="color: green;"> Casillero reservado exitosamente!</h1>
+    <div style="text-align: center;">
+        <br><h1 style="color: green;">Casillero {{ casillero_id }} reservado exitosamente!</h1>
 
-    <a href="{% url 'casilleros_lista' %}">Volver a la lista de casilleros disponibles</a>
+        <a href="{% url 'casilleros_lista' %}" class="btn btn-primary">Volver a la lista de casilleros disponibles</a>
+    </div>
     {% endblock %}
 </body>
 </html>
