@@ -17,6 +17,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('obtener_api_key/', views.obtener_api_key_usuario, name='obtener_api_key_usuario'),
-    
+    path('liberar_casillero/', views.liberar_casillero, name='liberar_casillero'),
 
 ]
