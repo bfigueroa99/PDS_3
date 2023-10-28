@@ -102,13 +102,14 @@ def liberar_casillero(request):
     
     if casillero_id is not None:
         try:
-            reserva = Reserva.objects.get(casillero__id=casillero_id, usuario=user)
-            casillero = reserva.casillero
-            casillero.disponible = True
-            casillero.save()
-            reserva.delete()
-        except Reserva.DoesNotExist:
-            return Response({'error': 'Casillero no reservado por el usuario'}, status=status.HTTP_400_BAD_REQUEST)
+            casillero = Casillero.objects.get(id=casillero_id)
+            if not casillero.disponible:
+                casillero.disponible = True
+                casillero.save()
+            else:
+                return Response({'error': 'Casillero is already available'}, status=status.HTTP_400_BAD_REQUEST)
+        except Casillero.DoesNotExist:
+            return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
         context = {'casillero_id': casillero_id}    
         return render(request, 'liberar_casillero.html', context)
