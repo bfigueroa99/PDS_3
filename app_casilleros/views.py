@@ -49,14 +49,14 @@ def casillero_detalle(request, pk):
     serializer = CasilleroSerializer(casillero)
     return Response(serializer.data)
 
-@api_view(['POST'])
+@login_required
 def reservar_casillero(request):
     user = request.user
     if not user.is_authenticated:
         return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     
     api_key = obtener_api_key(user)
-    casillero_id = 7
+    casillero_id = 11
     
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
