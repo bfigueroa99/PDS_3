@@ -56,24 +56,29 @@ def reservar_casillero(request):
         return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     
     api_key = obtener_api_key(user)
-    casillero_id = 11
+    casillero_id = None
+    
+    if request.method == 'POST':
+        casillero_id = request.POST.get('casillero_id')
     
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
     
-    try:
-        casillero = Casillero.objects.get(id=int(casillero_id), disponible=True)
-    except Casillero.DoesNotExist:
-        return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    reserva = Reserva(casillero=casillero, usuario=user)
-    reserva.save()
-    casillero.disponible = False
-    casillero.save()
-    
-    return render(request, 'reservar_casillero.html')
+    if casillero_id is not None:
+        try:
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible=True)
+        except Casillero.DoesNotExist:
+            return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        reserva = Reserva(casillero=casillero, usuario=user)
+        reserva.save()
+        casillero.disponible = False
+        casillero.save()
+
+    context = {'casillero_id': casillero_id}    
+    return render(request, 'reservar_casillero.html', context)
 
 
 @api_view(['POST'])
