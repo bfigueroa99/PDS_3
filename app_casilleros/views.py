@@ -32,7 +32,7 @@ class MyApiView(APIView):
 
 @api_view(['GET'])
 def casilleros_lista(request):
-    casilleros = Casillero.objects.filter(disponible=True)
+    casilleros = Casillero.objects.all()  # Obtener todos los casilleros sin filtrar
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
     return render(request, 'casilleros_lista.html', context)
