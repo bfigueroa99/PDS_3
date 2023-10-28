@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404, render
@@ -49,24 +49,32 @@ def casillero_detalle(request, pk):
     serializer = CasilleroSerializer(casillero)
     return Response(serializer.data)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def reservar_casillero(request):
     user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    
     api_key = obtener_api_key(user)
-    casillero_id = "4"
+    casillero_id = 7
+    
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+    
     try:
-        casillero = Casillero.objects.get(id=casillero_id, disponible=True)
+        casillero = Casillero.objects.get(id=int(casillero_id), disponible=True)
     except Casillero.DoesNotExist:
         return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
-    reserva = Reserva(casillero=casillero, usuario=api_key_obj.usuario)
+    
+    reserva = Reserva(casillero=casillero, usuario=user)
     reserva.save()
     casillero.disponible = False
     casillero.save()
+    
     return render(request, 'reservar_casillero.html')
+
 
 @api_view(['POST'])
 def confirmar_reserva(request):
