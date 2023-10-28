@@ -1,0 +1,17 @@
+{% extends 'navbar.html' %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liberar Casillero</title>
+</head>
+<body>
+    {% block content %}
+    <div style="text-align: center;">
+        <br><h1 style="color: green;">Casillero {{ casillero_id }} liberado exitosamente!</h1>
+
+        <a href="{% url 'casilleros_lista' %}" class="btn btn-primary">Volver a la lista de casilleros disponibles</a>
+    </div>
+    {% endblock %}
+</body>
+</html>
