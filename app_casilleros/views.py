@@ -31,11 +31,17 @@ class MyApiView(APIView):
     permission_classes = [IsAuthenticated] 
 
 @api_view(['GET'])
-def casilleros_disponibles(request):
+def casilleros_lista(request):
     casilleros = Casillero.objects.filter(disponible=True)
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
-    return render(request, 'casilleros_disponibles.html', context)
+    return render(request, 'casilleros_lista.html', context)
+
+@api_view(['GET'])
+def casilleros_disponibles(request):
+    casilleros = Casillero.objects.filter(disponible=True)
+    serializer = CasilleroSerializer(casilleros, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def casillero_detalle(request, pk):
@@ -43,10 +49,11 @@ def casillero_detalle(request, pk):
     serializer = CasilleroSerializer(casillero)
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def reservar_casillero(request):
-    api_key = request.data.get('api_key')
-    casillero_id = request.data.get('casillero_id')
+    user = request.user
+    api_key = obtener_api_key(user)
+    casillero_id = "4"
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
@@ -59,7 +66,7 @@ def reservar_casillero(request):
     reserva.save()
     casillero.disponible = False
     casillero.save()
-    return Response({'success': 'Reserva realizada con éxito'})
+    return render(request, 'reservar_casillero.html')
 
 @api_view(['POST'])
 def confirmar_reserva(request):
