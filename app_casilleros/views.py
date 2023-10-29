@@ -113,11 +113,42 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
+        casillero.clave = 1234
+        casillero.save()
+
         context = {'casillero_id': casillero_id}    
         return render(request, 'liberar_casillero.html', context)
     else:
         return Response({'error': 'No se proporcionó el ID del casillero'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@login_required
+def check_clave(request):
+    if request.method == 'POST':
+        inputted_clave = request.POST.get('inputted_clave')
+        casillero_id = 1
+        print(casillero_id, inputted_clave)
+
+        try:
+            casillero = Casillero.objects.get(id=casillero_id)
+        except Casillero.DoesNotExist:
+            return JsonResponse({'error': 'Casillero not found'}, status=400)
+
+        if str(inputted_clave) == str(casillero.clave):
+
+            return render(request, 'correct_clave.html')
+        else:
+            print(inputted_clave)
+            print(casillero.clave)
+            return JsonResponse({'error': 'Clave does not match'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@login_required
+def correct_clave(request):
+    return render(request, 'correct_clave.html') 
+    
 
 @api_view(['POST'])
 def confirmar_reserva(request):
