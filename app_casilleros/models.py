@@ -9,6 +9,7 @@ class Casillero(models.Model):
     ]
     tamano = models.CharField(max_length=1, choices=TAMANO_CHOICES)
     disponible = models.BooleanField(default=True)
+    clave = models.IntegerField(default=1234)
 
 class Reserva(models.Model):
     casillero = models.ForeignKey(Casillero, on_delete=models.CASCADE)

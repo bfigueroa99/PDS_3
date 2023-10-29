@@ -9,7 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .utils import obtener_api_key
+from .utils import obtener_api_key, generar_clave
 
 
 from .serializers import CasilleroSerializer
@@ -78,7 +78,9 @@ def reservar_casillero(request):
         casillero.disponible = False
         casillero.save()
 
-    context = {'casillero_id': casillero_id}    
+    casillero.clave = generar_clave()
+    casillero.save()
+    context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
 
 
