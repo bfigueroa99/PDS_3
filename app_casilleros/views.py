@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .utils import obtener_api_key, generar_clave
+from django.core.cache import cache
+
 
 
 from .serializers import CasilleroSerializer
@@ -61,24 +63,35 @@ def reservar_casillero(request):
     
     if request.method == 'POST':
         casillero_id = request.POST.get('casillero_id')
+        cache.set('last_casillero_id', casillero_id)
     
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
     if casillero_id is not None:
         try:
-            casillero = Casillero.objects.get(id=int(casillero_id), disponible=True)
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
+            cache.set('last_casillero', casillero)
+
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
         
         reserva = Reserva(casillero=casillero, usuario=user)
         reserva.save()
-        casillero.disponible = False
+        casillero.disponible = "R"
         casillero.save()
+        cache.set('last_casillero', casillero)
 
-    casillero.clave = generar_clave()
+    last_casillero_id = cache.get('last_casillero_id', 0)
+    last_casillero = cache.get("last_casillero", None)
+    
+    try:
+        casillero.clave = generar_clave()
+    except:
+        casillero = last_casillero
+        casillero.clave = generar_clave()
     casillero.save()
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
@@ -104,9 +117,10 @@ def liberar_casillero(request):
     
     if casillero_id is not None:
         try:
-            casillero = Casillero.objects.get(id=casillero_id)
-            if not casillero.disponible:
-                casillero.disponible = True
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible="R")
+            print(casillero.disponible)
+            if casillero.disponible == "R":
+                casillero.disponible = "D"
                 casillero.save()
             else:
                 return Response({'error': 'Casillero is already available'}, status=status.HTTP_400_BAD_REQUEST)
@@ -126,24 +140,19 @@ def liberar_casillero(request):
 def check_clave(request):
     if request.method == 'POST':
         inputted_clave = request.POST.get('inputted_clave')
-        casillero_id = 1
-        print(casillero_id, inputted_clave)
+        casillero_id = request.POST.get('casillero_id')
 
         try:
             casillero = Casillero.objects.get(id=casillero_id)
         except Casillero.DoesNotExist:
-            return JsonResponse({'error': 'Casillero not found'}, status=400)
+            return JsonResponse({'correct': False})
 
         if str(inputted_clave) == str(casillero.clave):
-
-            return render(request, 'correct_clave.html')
+            return JsonResponse({'correct': True})
         else:
-            print(inputted_clave)
-            print(casillero.clave)
-            return JsonResponse({'error': 'Clave does not match'}, status=400)
+            return JsonResponse({'correct': False})
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
+        return JsonResponse({'correct': False})
 
 @login_required
 def correct_clave(request):
