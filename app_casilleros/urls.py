@@ -20,5 +20,6 @@ urlpatterns = [
     path('liberar_casillero/', views.liberar_casillero, name='liberar_casillero'),
     path('check_clave/', views.check_clave, name='check_clave'),
     path('correct_clave/', views.correct_clave, name='correct_clave'),
-
+    path('casilleros/actualizar/<int:casillero_id>/', views.actualizar_disponibilidad_casillero, name='actualizar_disponibilidad_casillero'),    
+    
 ]
