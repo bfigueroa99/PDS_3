@@ -148,6 +148,8 @@ def check_clave(request):
             return JsonResponse({'correct': False})
 
         if str(inputted_clave) == str(casillero.clave):
+            casillero.abierto = True
+            casillero.save()
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
