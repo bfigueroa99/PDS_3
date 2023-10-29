@@ -15,7 +15,12 @@
                 <li>
                     Locker ID: {{ casillero.id }}<br>
                     Size: {{ casillero.tamano }}<br>
-                    Status: {% if casillero.disponible %}Available{% else %}Unavailable{% endif %}
+                    Status:
+                    {% if casillero.disponible == 'D' %}Disponible
+                    {% elif casillero.disponible == 'R' %}Reservado
+                    {% elif casillero.disponible == 'C' %}Confirmado
+                    {% elif casillero.disponible == 'A' %}Cargado{% endif %}
+
                     <form action="{% url 'reservar_casillero' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input type="hidden" name="api_key" value="{{ api_key }}">
