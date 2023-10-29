@@ -260,11 +260,14 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     except Casillero.DoesNotExist:
         return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-    nuevo_estado = request.data.get('disponible')  # Asegúrate de enviar el nuevo estado desde la solicitud
+    nuevo_estado = request.data.get('disponible')
 
-    # Aquí actualizas el estado del casillero basado en el nuevo estado proporcionado
     casillero.disponible = nuevo_estado
     casillero.save()
+
+    if casillero.disponible == "A":
+        casillero.abierto = False
+        casillero.save()
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
 
