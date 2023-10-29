@@ -18,5 +18,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('obtener_api_key/', views.obtener_api_key_usuario, name='obtener_api_key_usuario'),
     path('liberar_casillero/', views.liberar_casillero, name='liberar_casillero'),
+    path('check_clave/', views.check_clave, name='check_clave'),
+    path('correct_clave/', views.correct_clave, name='correct_clave'),
 
 ]
