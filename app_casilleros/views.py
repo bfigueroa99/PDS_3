@@ -72,7 +72,7 @@ def reservar_casillero(request):
 
     if casillero_id is not None:
         try:
-            casillero = Casillero.objects.get(id=int(casillero_id), disponible=True)
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
             cache.set('last_casillero', casillero)
 
         except Casillero.DoesNotExist:
@@ -80,7 +80,7 @@ def reservar_casillero(request):
         
         reserva = Reserva(casillero=casillero, usuario=user)
         reserva.save()
-        casillero.disponible = False
+        casillero.disponible = "R"
         casillero.save()
         cache.set('last_casillero', casillero)
 
@@ -117,9 +117,10 @@ def liberar_casillero(request):
     
     if casillero_id is not None:
         try:
-            casillero = Casillero.objects.get(id=casillero_id)
-            if not casillero.disponible:
-                casillero.disponible = True
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible="R")
+            print(casillero.disponible)
+            if casillero.disponible == "R":
+                casillero.disponible = "D"
                 casillero.save()
             else:
                 return Response({'error': 'Casillero is already available'}, status=status.HTTP_400_BAD_REQUEST)

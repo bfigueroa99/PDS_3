@@ -25,12 +25,12 @@ for _ in range(10):
 # Ejemplo para crear casilleros
 for _ in range(20):
     tamano = fake.random_element(elements=('P', 'M', 'G'))
-    disponible = fake.random_element(elements=(True, False))
+    disponible = fake.random_element(elements=("D"))
     Casillero.objects.create(tamano=tamano, disponible=disponible)
 
 # Ejemplo para crear reservas y api keys
 users = User.objects.all()
-casilleros = Casillero.objects.filter(disponible=True)
+casilleros = Casillero.objects.filter(disponible="D")
 
 for _ in range(30):
     usuario = fake.random_element(elements=users)
