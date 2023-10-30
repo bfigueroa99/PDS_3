@@ -103,8 +103,8 @@ def liberar_casillero(request):
     
     if casillero_id is not None:
         try:
-            casillero = Casillero.objects.get(id=int(casillero_id), disponible="R")
-            if casillero.disponible == "R":
+            casillero = Casillero.objects.get(id=int(casillero_id), disponible="A")
+            if casillero.disponible == "A":
                 pass
             else:
                 return Response({'error': 'Casillero is already available'}, status=status.HTTP_400_BAD_REQUEST)
@@ -273,7 +273,6 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.save()
 
     if casillero.disponible == "A":
-        casillero.abierto = False
         casillero.save()
     elif casillero.disponible == "D":
         casillero.abierto = False
