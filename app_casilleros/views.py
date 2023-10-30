@@ -148,6 +148,8 @@ def check_clave(request):
             return JsonResponse({'correct': False})
 
         if str(inputted_clave) == str(casillero.clave):
+            casillero.abierto = True
+            casillero.save()
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -261,7 +263,6 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
         return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
     nuevo_estado = request.data.get('disponible')
-
     casillero.disponible = nuevo_estado
     casillero.save()
 
