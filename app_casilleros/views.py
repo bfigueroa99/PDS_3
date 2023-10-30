@@ -153,8 +153,8 @@ def check_clave_l(request):
             return JsonResponse({'correct': False})
 
         if str(inputted_clave) == str(casillero.clave):
-            casillero.disponible = "D"
-            casillero.abierto = False
+            # casillero.disponible = "D"
+            casillero.abierto = True
             casillero.save()
             return JsonResponse({'correct': True})
         else:
@@ -269,15 +269,32 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
         return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
     nuevo_estado = request.data.get('disponible')
+    nuevo_abierto =  request.data.get('abierto')
     casillero.disponible = nuevo_estado
+    casillero.abierto = nuevo_abierto
+
     casillero.save()
 
     if casillero.disponible == "A":
-        casillero.abierto = False
-        casillero.save()
+        # casillero.abierto = False
+        # casillero.save()
+        pass
     elif casillero.disponible == "D":
-        casillero.abierto = False
-        casillero.save()
+        # casillero.abierto = False
+        # casillero.save()
+        pass
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
 
+@api_view(['POST'])
+def cerrar_casillero(request, casillero_id):
+    try:
+        casillero = Casillero.objects.get(id=casillero_id)
+    except Casillero.DoesNotExist:
+        return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    
+    cerrado = request.data.get("abierto")
+    casillero.abierto = cerrado
+    casillero.save()
+
+    return Response({'success': 'Casillero cerrado exitosamente'})
