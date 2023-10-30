@@ -273,6 +273,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.save()
 
     if casillero.disponible == "A":
+        casillero.abierto = False
         casillero.save()
     elif casillero.disponible == "D":
         casillero.abierto = False
