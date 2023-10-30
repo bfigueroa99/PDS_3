@@ -263,8 +263,9 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
         return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
     nuevo_estado = request.data.get('disponible')
-
+    nuevo_abierto = request.data.get('abierto')
     casillero.disponible = nuevo_estado
+    casillero.abierto = nuevo_abierto
     casillero.save()
 
     if casillero.disponible == "A":
