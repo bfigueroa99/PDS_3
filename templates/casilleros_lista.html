@@ -33,7 +33,7 @@
                     <form action="{% url 'liberar_casillero' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
-                        <button type="submit" class="btn btn-primary">Retirar</button>
+                        <br><button type="submit" class="btn btn-primary">Retirar</button>
 
                     </form>
                     {% endif %}
