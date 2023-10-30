@@ -286,3 +286,15 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
 
+@api_view(['POST'])
+def cerrar_casillero(request, casillero_id):
+    try:
+        casillero = Casillero.objects.get(id=casillero_id)
+    except Casillero.DoesNotExist:
+        return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    
+    cerrado = request.data.get("abierto")
+    casillero.abierto = cerrado
+    casillero.save()
+
+    return Response({'success': 'Casillero cerrado exitosamente'})
