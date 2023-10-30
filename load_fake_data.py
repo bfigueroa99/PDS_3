@@ -24,7 +24,7 @@ for _ in range(10):
 
 # Ejemplo para crear casilleros
 for _ in range(20):
-    tamano = fake.random_element(elements=('P', 'M', 'G'))
+    tamano = fake.random_element(elements=('M'))
     disponible = fake.random_element(elements=("D"))
     Casillero.objects.create(tamano=tamano, disponible=disponible)
 

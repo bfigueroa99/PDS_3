@@ -21,18 +21,22 @@
                     {% elif casillero.disponible == 'C' %}Confirmado
                     {% elif casillero.disponible == 'A' %}Cargado{% endif %}
 
+                    {% if casillero.disponible == 'D' %}
                     <form action="{% url 'reservar_casillero' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input type="hidden" name="api_key" value="{{ api_key }}">
                         <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
                         <br><button type="submit" class="btn btn-success">Reservar</button>
                     </form>
+                    {% endif %}
+                    {% if casillero.disponible == 'A' %}
                     <form action="{% url 'liberar_casillero' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
-                        <button type="submit" class="btn btn-danger">Liberar</button>
+                        <br><button type="submit" class="btn btn-primary">Retirar</button>
 
                     </form>
+                    {% endif %}
                 </li>
                 <hr>
             {% empty %}
