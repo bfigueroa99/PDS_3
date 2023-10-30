@@ -11,11 +11,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .utils import obtener_api_key, generar_clave
 from django.core.cache import cache
-
-
-
 from .serializers import CasilleroSerializer
-#a
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -63,7 +59,6 @@ def reservar_casillero(request):
     
     if request.method == 'POST':
         casillero_id = request.POST.get('casillero_id')
-        cache.set('last_casillero_id', casillero_id)
     
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
@@ -73,7 +68,6 @@ def reservar_casillero(request):
     if casillero_id is not None:
         try:
             casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
-            cache.set('last_casillero', casillero)
 
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
@@ -82,17 +76,9 @@ def reservar_casillero(request):
         reserva.save()
         casillero.disponible = "R"
         casillero.save()
-        cache.set('last_casillero', casillero)
+        casillero.clave = generar_clave()
+        casillero.save()
 
-    last_casillero_id = cache.get('last_casillero_id', 0)
-    last_casillero = cache.get("last_casillero", None)
-    
-    try:
-        casillero.clave = generar_clave()
-    except:
-        casillero = last_casillero
-        casillero.clave = generar_clave()
-    casillero.save()
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
 
@@ -118,26 +104,24 @@ def liberar_casillero(request):
     if casillero_id is not None:
         try:
             casillero = Casillero.objects.get(id=int(casillero_id), disponible="R")
-            print(casillero.disponible)
             if casillero.disponible == "R":
-                casillero.disponible = "D"
-                casillero.save()
+                pass
             else:
                 return Response({'error': 'Casillero is already available'}, status=status.HTTP_400_BAD_REQUEST)
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        casillero.clave = 1234
+        casillero.clave = generar_clave()
         casillero.save()
 
-        context = {'casillero_id': casillero_id}    
+        context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
     else:
         return Response({'error': 'No se proporcionó el ID del casillero'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @login_required
-def check_clave(request):
+def check_clave_r(request):
     if request.method == 'POST':
         inputted_clave = request.POST.get('inputted_clave')
         casillero_id = request.POST.get('casillero_id')
@@ -148,7 +132,29 @@ def check_clave(request):
             return JsonResponse({'correct': False})
 
         if str(inputted_clave) == str(casillero.clave):
+            casillero.disponible = "C"
             casillero.abierto = True
+            casillero.save()
+            return JsonResponse({'correct': True})
+        else:
+            return JsonResponse({'correct': False})
+    else:
+        return JsonResponse({'correct': False})
+    
+@login_required
+def check_clave_l(request):
+    if request.method == 'POST':
+        inputted_clave = request.POST.get('inputted_clave')
+        casillero_id = request.POST.get('casillero_id')
+
+        try:
+            casillero = Casillero.objects.get(id=casillero_id)
+        except Casillero.DoesNotExist:
+            return JsonResponse({'correct': False})
+
+        if str(inputted_clave) == str(casillero.clave):
+            casillero.disponible = "D"
+            casillero.abierto = False
             casillero.save()
             return JsonResponse({'correct': True})
         else:
@@ -267,6 +273,9 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.save()
 
     if casillero.disponible == "A":
+        casillero.abierto = False
+        casillero.save()
+    elif casillero.disponible == "D":
         casillero.abierto = False
         casillero.save()
 

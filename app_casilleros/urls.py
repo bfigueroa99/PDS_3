@@ -18,7 +18,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('obtener_api_key/', views.obtener_api_key_usuario, name='obtener_api_key_usuario'),
     path('liberar_casillero/', views.liberar_casillero, name='liberar_casillero'),
-    path('check_clave/', views.check_clave, name='check_clave'),
+    path('check_clave_r/', views.check_clave_r, name='check_clave_r'),
+    path('check_clave_l/', views.check_clave_l, name='check_clave_l'),
     path('correct_clave/', views.correct_clave, name='correct_clave'),
     path('casilleros/actualizar/<int:casillero_id>/', views.actualizar_disponibilidad_casillero, name='actualizar_disponibilidad_casillero'),    
     

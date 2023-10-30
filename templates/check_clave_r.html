@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Clave</title>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    {% block content %}
+    <div style="text-align: center;">
+        <br><h6>Introduzca la clave para abrir el casillero:</h6>
+        <form method="post" id="check-clave-form">
+            {% csrf_token %}
+            <div class="form-group" style="display: inline-block; text-align: center;">
+                <input type="text" class="form-control" id="exampleInput" name="inputted_clave" placeholder="Clave casillero" style="width: 200px, ;">
+            </div>
+            <br><button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <div id="result-message" style="display: none;"></div>
+    </div>
+    {% endblock %}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#check-clave-form").on("submit", function(event) {
+                event.preventDefault();
+                var inputted_clave = $("#exampleInput").val();
+                var casillero_id = "{{ casillero_id }}"; 
+                var csrf_token = $("input[name=csrfmiddlewaretoken]").val(); 
+    
+                $.ajax({
+                    url: "{% url 'check_clave_r' %}",
+                    type: "POST",
+                    data: {
+                        'inputted_clave': inputted_clave,
+                        'casillero_id': casillero_id,
+                        'csrfmiddlewaretoken': csrf_token
+                    },
+                    success: function(response) {
+                        if (response.correct) {
+                            $("#result-message").text("Correct password").css("color", "green");
+                        } else {
+                            $("#result-message").text("Incorrect password").css("color", "red");
+                        }
+                        $("#result-message").show();
+                    },
+                    error: function(response) {
+                        console.error(response);
+                    }
+                });
+            });
+        });
+    </script>    
+</body>
+</html>
