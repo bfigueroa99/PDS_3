@@ -313,6 +313,8 @@ def cerrar_casillero(request, casillero_id):
 
     return Response({'success': 'Casillero cerrado exitosamente'})
 
+@login_required
 def send_mail_view(request):
-    send_mail('Subject','Message','saccnotification@gmail.com',['terdmannsdorffer@gmail.com', 'bfigueroa@miuandes.cl'])
-    return render(request, 'send/send_mail_view.html')
+    mail = request.user.email
+    send_mail('Subject','Message','saccnotification@gmail.com',[mail])
+    return render(request, 'send_mail_view.html')

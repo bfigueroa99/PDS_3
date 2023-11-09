@@ -11,7 +11,7 @@ from faker import Faker
 fake = Faker()
 
 username = "juan"
-email = fake.email()
+email = "sacc.user3@gmail.com"
 password = "hola123"
 user = User.objects.create_user(username=username, email=email, password=password)
 
