@@ -148,6 +148,6 @@ LOGIN_URL = 'login'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'saccnotification@gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = '1234567sacc'
+EMAIL_HOST_PASSWORD = 'pqeuosgvrckdypjx'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

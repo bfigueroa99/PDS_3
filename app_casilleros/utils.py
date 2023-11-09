@@ -1,5 +1,7 @@
 from .models import ApiKey
 from random import randint
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 def obtener_api_key(usuario):
     try:
