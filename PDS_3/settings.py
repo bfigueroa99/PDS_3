@@ -144,3 +144,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PDS_3.settings")
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'saccnotification@gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = '1234567sacc'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
