@@ -22,6 +22,7 @@ urlpatterns = [
     path('check_clave_l/', views.check_clave_l, name='check_clave_l'),
     path('correct_clave/', views.correct_clave, name='correct_clave'),
     path('casilleros/actualizar/<int:casillero_id>/', views.actualizar_disponibilidad_casillero, name='actualizar_disponibilidad_casillero'),    
-    path('casilleros/cerrar_casillero/<int:casillero_id>/', views.cerrar_casillero, name='cerrar_casillero'),    
-    
+    path('casilleros/cerrar_casillero/<int:casillero_id>/', views.cerrar_casillero, name='cerrar_casillero'),
+    path('force_close/<int:casillero_id>/', views.force_close, name='force_close'),
+    path('send_mail_view/', views.send_mail_view, name = 'send_mail_view'),
 ]

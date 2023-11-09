@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from .utils import obtener_api_key, generar_clave
 from django.core.cache import cache
 from .serializers import CasilleroSerializer
+from django.core.mail import send_mail
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -163,6 +164,19 @@ def check_clave_l(request):
         return JsonResponse({'correct': False})
 
 @login_required
+def force_close(request):
+    if request.method == 'POST':
+        casillero_id = request.POST.get('casillero_id')
+
+        try:
+            casillero = Casillero.objects.get(id=casillero_id)
+        except Casillero.DoesNotExist:
+            return JsonResponse({'correct': False})
+        
+        casillero.abierto = False
+        casillero.save()
+
+@login_required
 def correct_clave(request):
     return render(request, 'correct_clave.html') 
     
@@ -298,3 +312,7 @@ def cerrar_casillero(request, casillero_id):
     casillero.save()
 
     return Response({'success': 'Casillero cerrado exitosamente'})
+
+def send_mail_view(request):
+    send_mail('Subject','Message','saccnotification@gmail.com',['terdmannsdorffer@gmail.com', 'bfigueroa@miuandes.cl'])
+    return render(request, 'send/send_mail_view.html')
