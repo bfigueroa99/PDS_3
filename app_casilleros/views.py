@@ -76,7 +76,8 @@ def reservar_casillero(request):
         reserva = Reserva(casillero=casillero, usuario=user)
         reserva.save()
         casillero.disponible = "R"
-        casillero.save()
+        casillero.r_email = user.email
+        casillero.r_username = user.username
         casillero.clave = generar_clave()
         casillero.save()
 
@@ -112,8 +113,8 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        casillero.clave = generar_clave()
-        casillero.save()
+        # casillero.clave = generar_clave()
+        # casillero.save()
 
         context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
@@ -156,7 +157,8 @@ def check_clave_l(request):
         if str(inputted_clave) == str(casillero.clave):
             # casillero.disponible = "D"
             casillero.abierto = True
-            casillero.save()
+            casillero.r_email = "@gmail.com"
+            casillero.r_username = ""
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -286,7 +288,10 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     nuevo_abierto =  request.data.get('abierto')
     casillero.disponible = nuevo_estado
     casillero.abierto = nuevo_abierto
-
+    casillero.clave = generar_clave()
+    subject = "Carga de casillero"
+    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
+    send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
 
     if casillero.disponible == "A":
