@@ -112,8 +112,8 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        casillero.clave = generar_clave()
-        casillero.save()
+        # casillero.clave = generar_clave()
+        # casillero.save()
 
         context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
@@ -284,6 +284,13 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
 
     nuevo_estado = request.data.get('disponible')
     nuevo_abierto =  request.data.get('abierto')
+    mail = request.user.email
+    usuario = request.user.username
+    subject = "Carga de casillero"
+    casillero.clave = generar_clave()
+    casillero.save()
+    message = f"Estimado {usuario},\n\nLe informamos que su paquete ha sido cargado en el casillero N°{casillero_id}. El codigo para abrir el casillero es '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
+    send_mail(subject,message,'saccnotification@gmail.com',[mail])
     casillero.disponible = nuevo_estado
     casillero.abierto = nuevo_abierto
 
@@ -316,5 +323,10 @@ def cerrar_casillero(request, casillero_id):
 @login_required
 def send_mail_view(request):
     mail = request.user.email
+    # casillero_id = 5
+    # usuario = request.user.username
+    # subject = "Carga de casillero"
+    # message = f"Estimado {usuario},\n\nLe informamos que su paquete ha sido cargado en el casillero N°{casillero_id}. El codigo para abrir el casillero es '{clave}'.\n\nMuchas gracias por su preferencia."
+    # send_mail(subject,message,'saccnotification@gmail.com',[mail])
     send_mail('Subject','Message','saccnotification@gmail.com',[mail])
     return render(request, 'send_mail_view.html')
