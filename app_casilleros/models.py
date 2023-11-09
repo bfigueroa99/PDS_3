@@ -17,6 +17,8 @@ class Casillero(models.Model):
     disponible = models.CharField(max_length=1, choices=DISPONIBLE_CHOICES, default="D")
     clave = models.IntegerField(default=1234)
     abierto = models.BooleanField(default=False)
+    r_username = models.CharField(max_length=50,default="")
+    r_email = models.CharField(max_length=50,default='@gmail.com')
 
 class Reserva(models.Model):
     casillero = models.ForeignKey(Casillero, on_delete=models.CASCADE)
