@@ -26,7 +26,9 @@ for _ in range(10):
 for _ in range(20):
     tamano = fake.random_element(elements=('M'))
     disponible = fake.random_element(elements=("D"))
-    Casillero.objects.create(tamano=tamano, disponible=disponible)
+    r_username = None
+    r_email = None
+    Casillero.objects.create(tamano=tamano, disponible=disponible, r_username=r_username, r_email=r_email)
 
 # Ejemplo para crear reservas y api keys
 users = User.objects.all()
