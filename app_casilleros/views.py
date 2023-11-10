@@ -158,7 +158,7 @@ def check_clave_l(request):
             # casillero.disponible = "D"
             casillero.abierto = True
             casillero.r_email = None
-            casillero.r_username = ""
+            casillero.r_username = None
             casillero.save()
             return JsonResponse({'correct': True})
         else:
