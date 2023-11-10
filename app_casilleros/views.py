@@ -159,6 +159,7 @@ def check_clave_l(request):
             casillero.abierto = True
             casillero.r_email = "@test_testgmail.com"
             casillero.r_username = ""
+            casillero.save()
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -289,6 +290,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.disponible = nuevo_estado
     casillero.abierto = nuevo_abierto
     casillero.clave = generar_clave()
+    print(str(casillero.clave))
     subject = "Carga de casillero"
     message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
