@@ -1,8 +1,9 @@
 {% extends 'navbar.html' %}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Available Lockers</title>
 </head>
 <body>
@@ -15,6 +16,8 @@
                 <li>
                     Locker ID: {{ casillero.id }}<br>
                     Size: {{ casillero.tamano }}<br>
+                    Datos U: {{ casillero.r_email }} {{ casillero.r_username }}<br>
+                    Datos O {{ casillero.o_email }} {{ casillero.o_name }}<br>
                     Status:
                     {% if casillero.disponible == 'D' %}Disponible
                     {% elif casillero.disponible == 'R' %}Reservado
@@ -22,20 +25,33 @@
                     {% elif casillero.disponible == 'A' %}Cargado{% endif %}
 
                     {% if casillero.disponible == 'D' %}
-                    <form action="{% url 'reservar_casillero' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="api_key" value="{{ api_key }}">
-                        <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
-                        <br><button type="submit" class="btn btn-success">Reservar</button>
-                    </form>
-                    {% endif %}
-                    {% if casillero.disponible == 'A' %}
-                    <form action="{% url 'liberar_casillero' %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
-                        <br><button type="submit" class="btn btn-primary">Retirar</button>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#reservaModal{{ casillero.id }}">
+                            Reservar
+                        </button>
 
-                    </form>
+                        <div class="modal fade" id="reservaModal{{ casillero.id }}" tabindex="-1" role="dialog" aria-labelledby="reservaModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="reservaModalLabel">Reserva Form</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% include 'form_reserva.html' with casillero_id=casillero.id %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if casillero.disponible == 'A' %}
+                        <form action="{% url 'liberar_casillero' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="casillero_id" value="{{ casillero.id }}">
+                            <br><button type="submit" class="btn btn-primary">Retirar</button>
+                        </form>
                     {% endif %}
                 </li>
                 <hr>
@@ -44,6 +60,10 @@
             {% endfor %}
         </ul>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js" integrity="sha384-M6g1E+RZ4Di8SRTqZMOvUb4EzZInWqylW/5b7AuLlAyQFprAJg+jDaL8OARb//bU" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     {% endblock %}
 </body>
 </html>
