@@ -157,7 +157,7 @@ def check_clave_l(request):
         if str(inputted_clave) == str(casillero.clave):
             # casillero.disponible = "D"
             casillero.abierto = True
-            casillero.r_email = "@gmail.com"
+            casillero.r_email = "@test_testgmail.com"
             casillero.r_username = ""
             return JsonResponse({'correct': True})
         else:
