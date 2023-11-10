@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Casillero, Reserva, ApiKey, User
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
@@ -50,21 +50,20 @@ def casillero_detalle(request, pk):
     return Response(serializer.data)
 
 @login_required
-def reservar_casillero(request):
+def reservar_casillero(request, casillero_id):
     user = request.user
+
     if not user.is_authenticated:
         return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
     api_key = obtener_api_key(user)
-    casillero_id = None
-    
-    if request.method == 'POST':
-        casillero_id = request.POST.get('casillero_id')
-    
+
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    print(casillero_id)
 
     if casillero_id is not None:
         try:
@@ -72,12 +71,10 @@ def reservar_casillero(request):
 
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         reserva = Reserva(casillero=casillero, usuario=user)
         reserva.save()
         casillero.disponible = "R"
-        casillero.r_email = user.email
-        casillero.r_username = user.username
         casillero.clave = generar_clave()
         casillero.save()
 
@@ -159,6 +156,8 @@ def check_clave_l(request):
             casillero.abierto = True
             casillero.r_email = None
             casillero.r_username = None
+            casillero.o_email = None
+            casillero.o_name = None
             casillero.save()
             return JsonResponse({'correct': True})
         else:
@@ -325,3 +324,38 @@ def send_mail_view(request):
     mail = request.user.email
     send_mail('Subject','Message','saccnotification@gmail.com',[mail])
     return render(request, 'send_mail_view.html')
+
+@login_required
+def form_reserva(request, casillero_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    api_key = obtener_api_key(user)
+
+    try:
+        api_key_obj = ApiKey.objects.get(key=api_key)
+    except ApiKey.DoesNotExist:
+        return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if request.method == 'POST':
+        input_client_email = request.POST.get('client_email')
+        input_client_username = request.POST.get('client_username')
+        input_operator_email = request.POST.get('operator_email')
+        input_operator_name = request.POST.get('operator_name')
+
+        try:
+            casillero = Casillero.objects.get(id=casillero_id, disponible="D")
+        except Casillero.DoesNotExist:
+            return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        casillero.r_email = input_client_email
+        casillero.r_username = input_client_username
+        casillero.o_email = input_operator_email
+        casillero.o_name = input_operator_name
+        casillero.save()
+
+        return redirect('reservar_casillero', casillero_id=casillero_id)
+
+    return render(request, 'form_reserva.html', {'casillero_id': casillero_id})
+

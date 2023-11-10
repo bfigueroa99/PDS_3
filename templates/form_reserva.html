@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Form</title>
+</head>
+<body>
+
+  <h2>Reserva Form</h2>
+
+  <form method="post" action="{% url 'form_reserva' casillero_id %}">
+    {% csrf_token %}
+    <label for="client_email">Client Email:</label>
+    <input type="text" id="client_email" name="client_email" required><br>
+
+    <label for="client_username">Client Username:</label>
+    <input type="text" id="client_username" name="client_username" required><br>
+
+    <label for="operator_email">Operator Email:</label>
+    <input type="text" id="operator_email" name="operator_email" required><br>
+
+    <label for="operator_name">Operator Name:</label>
+    <input type="text" id="operator_name" name="operator_name" required><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+</body>
+</html>

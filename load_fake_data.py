@@ -28,7 +28,10 @@ for _ in range(20):
     disponible = fake.random_element(elements=("D"))
     r_username = None
     r_email = None
-    Casillero.objects.create(tamano=tamano, disponible=disponible, r_username=r_username, r_email=r_email)
+    o_email = None
+    o_name = None
+
+    Casillero.objects.create(tamano=tamano, disponible=disponible, r_username=r_username, r_email=r_email, o_email=o_email, o_name=o_name)
 
 # Ejemplo para crear reservas y api keys
 users = User.objects.all()
