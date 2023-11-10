@@ -63,8 +63,6 @@ def reservar_casillero(request, casillero_id):
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    print(casillero_id)
-
     if casillero_id is not None:
         try:
             casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
@@ -76,6 +74,10 @@ def reservar_casillero(request, casillero_id):
         reserva.save()
         casillero.disponible = "R"
         casillero.clave = generar_clave()
+        print(str(casillero.clave))
+        subject = "Reserva de casillero"
+        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por trabajar con nosotros."
+        send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
         casillero.save()
 
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
@@ -291,7 +293,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.clave = generar_clave()
     print(str(casillero.clave))
     subject = "Carga de casillero"
-    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
+    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
 
