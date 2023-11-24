@@ -13,6 +13,8 @@ from .utils import obtener_api_key, generar_clave
 from django.core.cache import cache
 from .serializers import CasilleroSerializer
 from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.urls import reverse
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -75,8 +77,10 @@ def reservar_casillero(request, casillero_id):
         casillero.disponible = "R"
         casillero.clave = generar_clave()
         print(str(casillero.clave))
+        enlace = request.build_absolute_uri(reverse('verificar_reserva', kwargs={'casillero_id': casillero_id, 'clave': casillero.clave}))
+
         subject = "Reserva de casillero"
-        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por trabajar con nosotros."
+        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\nMuchas gracias por trabajar con nosotros."
         send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
         casillero.save()
 
@@ -370,3 +374,13 @@ def form_reserva(request, casillero_id):
 
     return render(request, 'form_reserva.html', {'casillero_id': casillero_id})
 
+@login_required
+def verificar_reserva(request, casillero_id, clave):
+    casillero = get_object_or_404(Casillero, id=casillero_id)
+
+    if str(clave) == str(casillero.clave):
+        # Clave correcta, realizar acciones adicionales si es necesario
+        return render(request, 'correct_clave.html', {'casillero_id': casillero_id})
+    else:
+        # Clave incorrecta, redirigir o mostrar un mensaje de error
+        return HttpResponse('Clave incorrecta')
