@@ -26,4 +26,5 @@ urlpatterns = [
     path('force_close/<int:casillero_id>/', views.force_close, name='force_close'),
     path('send_mail_view/', views.send_mail_view, name = 'send_mail_view'),
     path('form_reserva/<int:casillero_id>/', views.form_reserva, name='form_reserva'),
+    path('detalles_casillero/<int:casillero_id>/', views.detalles_casillero, name='detalles_casillero'),
 ]

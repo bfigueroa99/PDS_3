@@ -37,10 +37,5 @@ for _ in range(20):
 users = User.objects.all()
 casilleros = Casillero.objects.filter(disponible="D")
 
-for _ in range(30):
-    usuario = fake.random_element(elements=users)
-    casillero = fake.random_element(elements=casilleros)
-    Reserva.objects.create(casillero=casillero, usuario=usuario, confirmada=fake.random_element(elements=(True, False)))
-
 for user in users:
     ApiKey.objects.create(usuario=user, key=fake.uuid4())

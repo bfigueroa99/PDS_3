@@ -31,14 +31,14 @@ class MyApiView(APIView):
 
 @api_view(['GET'])
 def casilleros_lista(request):
-    casilleros = Casillero.objects.all()  # Obtener todos los casilleros sin filtrar
+    casilleros = Casillero.objects.all()
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
     return render(request, 'casilleros_lista.html', context)
 
 @api_view(['GET'])
 def casilleros_disponibles(request):
-    casilleros = Casillero.objects.all()  # Obtener todos los casilleros sin filtrar
+    casilleros = Casillero.objects.all()
     serializer = CasilleroSerializer(casilleros, many=True)
     return Response(serializer.data)
 
@@ -184,6 +184,15 @@ def force_close(request):
 def correct_clave(request):
     return render(request, 'correct_clave.html') 
     
+@login_required
+def detalles_casillero(request, casillero_id):
+    casillero = get_object_or_404(Casillero, id=casillero_id)
+    context = {'casillero': casillero}
+    return render(request, 'detalles_casillero.html', context)
+
+
+
+
 
 @api_view(['POST'])
 def confirmar_reserva(request):

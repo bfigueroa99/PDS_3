@@ -25,7 +25,7 @@
                     {% elif casillero.disponible == 'A' %}Cargado{% endif %}
 
                     {% if casillero.disponible == 'D' %}
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#reservaModal{{ casillero.id }}">
+                        <br><button type="button" class="btn btn-success" data-toggle="modal" data-target="#reservaModal{{ casillero.id }}">
                             Reservar
                         </button>
 
@@ -53,6 +53,8 @@
                             <br><button type="submit" class="btn btn-primary">Retirar</button>
                         </form>
                     {% endif %}
+                    <br>
+                    <a href="{% url 'detalles_casillero' casillero.id %}" class="btn btn-info">Ver detalle del casillero</a>
                 </li>
                 <hr>
             {% empty %}
