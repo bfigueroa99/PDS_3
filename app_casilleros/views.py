@@ -80,7 +80,7 @@ def reservar_casillero(request, casillero_id):
         enlace = request.build_absolute_uri(reverse('verificar_reserva', kwargs={'casillero_id': casillero_id, 'clave': casillero.clave}))
 
         subject = "Reserva de casillero"
-        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\nMuchas gracias por trabajar con nosotros."
+        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\n o ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n Muchas gracias por trabajar con nosotros."
         send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
         casillero.save()
 
@@ -305,8 +305,9 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.abierto = nuevo_abierto
     casillero.clave = generar_clave()
     print(str(casillero.clave))
+    enlace = request.build_absolute_uri(reverse('verificar_reserva', kwargs={'casillero_id': casillero_id, 'clave': casillero.clave}))
     subject = "Carga de casillero"
-    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
+    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}.Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\n  o ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
 
