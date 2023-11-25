@@ -55,6 +55,7 @@ def casilleros_disponibles(request):
 def casillero_detalle(request, pk):
     casillero = get_object_or_404(Casillero, pk=pk)
     serializer = CasilleroSerializer(casillero)
+    print(exec_times)
     return Response(serializer.data)
 
 @login_required
@@ -89,6 +90,8 @@ def reservar_casillero(request, casillero_id):
         message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\n o ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n Muchas gracias por trabajar con nosotros."
         send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
         casillero.save()
+
+    start_time = time.time()
 
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
@@ -220,7 +223,7 @@ def confirmar_reserva(request):
     reserva.confirmada = True
     reserva.fecha_confirmacion = timezone.now()
     #timer para los promedios
-    start_time = time.time()
+
     reserva.save()
     return Response({'success': 'Reserva confirmada con éxito'})
 
@@ -238,9 +241,7 @@ def cancelar_reserva(request):
         return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
     reserva.cancelada = True
     #timer para los promedios
-    end_time = time.time()
-    elapsed_time = end_time - request.data.get('start_time')
-    exec_times[reserva_id] = elapsed_time
+    
     
     reserva.fecha_cancelacion = timezone.now()
     reserva.save()
@@ -324,6 +325,14 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}.Para abrir y depositar el pedido, haga clic en el siguiente enlace: {enlace}.\n\n  o ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
+
+
+    end_time = time.time()
+    elapsed_time = end_time - request.data.get('start_time')
+    exec_times[reserva_id] = elapsed_time
+    print(exec_times)
+
+    
 
     if casillero.disponible == "A":
         # casillero.abierto = False
