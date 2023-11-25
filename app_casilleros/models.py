@@ -22,7 +22,7 @@ class Casillero(models.Model):
     r_email = models.CharField(max_length=50, null=True)
     o_email = models.CharField(max_length=50, null=True)
     o_name = models.CharField(max_length=50, null=True)
-    fecha_creacion = models.DateTimeField(default=datetime.today)
+    fecha_creacion = models.DateTimeField(default=datetime.today())
 
 class ApiKey(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
