@@ -16,6 +16,11 @@ from django.core.mail import send_mail
 from datetime import datetime
 from django.http import HttpResponse
 from django.urls import reverse
+import time
+
+
+exec_times= []
+
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -200,7 +205,6 @@ def detalles_casillero(request, casillero_id):
 
 
 
-
 @api_view(['POST'])
 def confirmar_reserva(request):
     api_key = request.data.get('api_key')
@@ -215,6 +219,8 @@ def confirmar_reserva(request):
         return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
     reserva.confirmada = True
     reserva.fecha_confirmacion = timezone.now()
+    #timer para los promedios
+    start_time = time.time()
     reserva.save()
     return Response({'success': 'Reserva confirmada con éxito'})
 
