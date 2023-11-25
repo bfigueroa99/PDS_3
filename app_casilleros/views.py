@@ -13,6 +13,7 @@ from .utils import obtener_api_key, generar_clave
 from django.core.cache import cache
 from .serializers import CasilleroSerializer
 from django.core.mail import send_mail
+from datetime import datetime
 from django.http import HttpResponse
 from django.urls import reverse
 
@@ -72,7 +73,7 @@ def reservar_casillero(request, casillero_id):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
 
-        reserva = Reserva(casillero=casillero, usuario=user)
+        reserva = Reserva(casillero=casillero, usuario=user, fecha_reserva=datetime.today())
         reserva.save()
         casillero.disponible = "R"
         casillero.clave = generar_clave()
@@ -191,7 +192,9 @@ def correct_clave(request):
 @login_required
 def detalles_casillero(request, casillero_id):
     casillero = get_object_or_404(Casillero, id=casillero_id)
-    context = {'casillero': casillero}
+    reservas = Reserva.objects.filter(casillero__id=casillero_id)
+    print(reservas)
+    context = {'casillero': casillero, 'reservas': reservas}
     return render(request, 'detalles_casillero.html', context)
 
 
