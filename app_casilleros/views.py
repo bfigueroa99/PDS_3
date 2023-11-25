@@ -19,7 +19,7 @@ from django.urls import reverse
 import time
 
 
-exec_times= []
+exec_times= {}
 
 
 class ApiKeyAuthentication(BaseAuthentication):
@@ -237,6 +237,11 @@ def cancelar_reserva(request):
     except Reserva.DoesNotExist:
         return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
     reserva.cancelada = True
+    #timer para los promedios
+    end_time = time.time()
+    elapsed_time = end_time - request.data.get('start_time')
+    exec_times[reserva_id] = elapsed_time
+    
     reserva.fecha_cancelacion = timezone.now()
     reserva.save()
     casillero = reserva.casillero
