@@ -27,4 +27,5 @@ urlpatterns = [
     path('send_mail_view/', views.send_mail_view, name = 'send_mail_view'),
     path('form_reserva/<int:casillero_id>/', views.form_reserva, name='form_reserva'),
     path('detalles_casillero/<int:casillero_id>/', views.detalles_casillero, name='detalles_casillero'),
+    path('ingresar-clave/<int:casillero_id>/<str:clave>/<int:opcion>', views.ingresar_clave_view, name='ingresar_clave'),
 ]

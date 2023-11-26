@@ -13,6 +13,8 @@ from .utils import obtener_api_key, generar_clave
 from django.core.cache import cache
 from .serializers import CasilleroSerializer
 from django.core.mail import send_mail
+from django.urls import reverse
+
 
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -75,8 +77,9 @@ def reservar_casillero(request, casillero_id):
         casillero.disponible = "R"
         casillero.clave = generar_clave()
         print(str(casillero.clave))
+        enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,0]))
         subject = "Reserva de casillero"
-        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}. Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por trabajar con nosotros."
+        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}.Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por trabajar con nosotros."
         send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
         casillero.save()
 
@@ -301,6 +304,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     casillero.abierto = nuevo_abierto
     casillero.clave = generar_clave()
     print(str(casillero.clave))
+    enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,1]))
     subject = "Carga de casillero"
     message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
@@ -370,3 +374,12 @@ def form_reserva(request, casillero_id):
 
     return render(request, 'form_reserva.html', {'casillero_id': casillero_id})
 
+
+@login_required
+def ingresar_clave_view(request, casillero_id, clave, opcion):
+    # Lógica para verificar la clave y realizar las acciones correspondientes
+    # Puedes redirigir a otra página o mostrar un mensaje de éxito aquí
+    if opcion == 0:
+        return render(request, 'check_clave_r.html', {'casillero_id': casillero_id, 'clave': clave})
+    if opcion == 1:
+        return render(request, 'check_clave_l.html', {'casillero_id': casillero_id, 'clave': clave})
