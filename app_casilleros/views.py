@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 
 
+
 class ApiKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
         api_key = request.data.get('api_key')
