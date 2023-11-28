@@ -30,8 +30,14 @@ for _ in range(20):
     r_email = None
     o_email = None
     o_name = None
+    if _ in [0,1,2]:
+        estacion = 1
+    elif _ in [3,4,5]:
+        estacion = 2
+    elif _ in [6,7,8]:
+        estacion = 3
 
-    Casillero.objects.create(tamano=tamano, disponible=disponible, r_username=r_username, r_email=r_email, o_email=o_email, o_name=o_name)
+    Casillero.objects.create(tamano=tamano, disponible=disponible, r_username=r_username, r_email=r_email, o_email=o_email, o_name=o_name, estacion=estacion)
 
 # Ejemplo para crear reservas y api keys
 users = User.objects.all()

@@ -14,6 +14,7 @@ from django.core.cache import cache
 from .serializers import CasilleroSerializer
 from django.core.mail import send_mail
 from django.urls import reverse
+import requests
 
 
 
@@ -384,3 +385,88 @@ def ingresar_clave_view(request, casillero_id, clave, opcion):
         return render(request, 'check_clave_r.html', {'casillero_id': casillero_id, 'clave': clave})
     if opcion == 1:
         return render(request, 'check_clave_l.html', {'casillero_id': casillero_id, 'clave': clave})
+
+def translate_json456(data):
+    casillero_id = data.get('id')
+    availability = data.get('availability')
+    reserved = data.get('reserved')
+    confirmed = data.get('confirmed')
+    loaded = data.get('loaded' )
+    locked = data.get('locked')
+
+    if casillero_id in [4,5,6]:
+        if availability:
+            data['disponible'] = "D"
+        elif reserved:
+            data['disponible'] = "R"
+        elif confirmed:
+            data['disponible'] = "C"
+        elif loaded:
+            data['disponible'] = "A"
+
+        if locked == True:
+            data['abierto'] = False
+        elif locked == False:
+            data['abierto'] = True
+
+        data.pop('availability', None)
+        data.pop('reserved', None)
+        data.pop('confirmed', None)
+        data.pop('loaded', None)
+        data.pop('opened', None)
+        data.pop('locked', None)
+
+    return data
+
+
+
+def translate_json654(data):
+    casillero_id = data.get('id')
+    disponible = data.get('disponible')
+    abierto = data.get('abierto')
+
+    if casillero_id in [4,5,6]:
+        if disponible == "D":
+            data['availability'] = True
+            data['reserved'] = False
+            data['confirmed'] = False
+            data['loaded'] = False
+        elif disponible == "R":
+            data['availability'] = False
+            data['reserved'] = True
+            data['confirmed'] = False
+            data['loaded'] = False
+        elif disponible == "C":
+            data['availability'] = False
+            data['reserved'] = False
+            data['confirmed'] = True
+            data['loaded'] = False
+        elif disponible == "A":
+            data['availability'] = False
+            data['reserved'] = False
+            data['confirmed'] = False
+            data['loaded'] = True
+
+        if abierto == True:
+            data['locked'] = False
+        elif abierto == False:
+            data['locked'] = True
+
+        data['height'] = 26.0
+        data['width'] = 43.0
+
+        data.pop('disponible', None)
+        data.pop('abierto', None)
+        data.pop('o_email', None)
+        data.pop('r_email', None)
+        data.pop('r_username', None)
+        data.pop('o_name', None)
+        data.pop('tamano', None)
+
+    return data
+
+def reservar_amiwos():
+    response = requests.get('https://tsqrmn8j-8000.brs.devtunnels.ms/stations/2/get_lockers_by_station/')
+    print(response.json())
+    
+reservar_amiwos()
