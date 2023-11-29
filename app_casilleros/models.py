@@ -31,11 +31,19 @@ class ApiKey(models.Model):
 
 class Reserva(models.Model):
     casillero = models.ForeignKey(Casillero, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE) # este no se usa, pero no lo borrare por si las moscas
     fecha_reserva = models.DateTimeField(null=True, blank=True)
     fecha_carga = models.DateTimeField(null=True, blank=True)
     fecha_retiro = models.DateTimeField(null=True, blank=True)
-    # bitacora = models.TextField(default='')
+    bitacora = models.TextField(default='')
+
+    def agregar_a_bitacora_reserva(self, mensaje):
+        self.bitacora += f"{mensaje} por cliente {self.casillero.r_username} el {datetime.now()}.\n"
+        self.save()
+    
+    def agregar_a_bitacora_cargado(self, mensaje):
+        self.bitacora += f"{mensaje} por operador {self.casillero.o_username} el {datetime.now()}.\n"
+        self.save()
 
 class Historial(models.Model):
     reserva = models.ForeignKey(Reserva, on_delete=models.CASCADE)
