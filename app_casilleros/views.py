@@ -15,6 +15,8 @@ from .serializers import CasilleroSerializer
 from django.core.mail import send_mail
 from django.urls import reverse
 import requests
+import ujson
+from datetime import datetime
 
 
 
@@ -36,6 +38,29 @@ class MyApiView(APIView):
 @api_view(['GET'])
 def casilleros_lista(request):
     casilleros = Casillero.objects.all()
+    # try:
+    #     locker4 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/4/").json()
+    #     locker5 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/5/").json()
+    #     locker6 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/6/").json()
+    #     locker4 = translate_json456(locker4)
+    #     locker4.fecha_creacion = get_object_or_404(Casillero, id=4).fecha_creacion
+    #     locker4.save()
+    #     locker4.id = 4
+    #     locker4.save()
+    #     locker5 = translate_json456(locker5)
+    #     locker5.fecha_creacion = get_object_or_404(Casillero, id=5).fecha_creacion
+    #     locker5.save()
+    #     locker5.id = 5
+    #     locker5.save()
+    #     locker6 = translate_json456(locker6)
+    #     locker6.fecha_creacion = get_object_or_404(Casillero, id=6).fecha_creacion
+    #     locker6.save()
+    #     locker6.id = 6
+    #     locker6.save()
+    # except:
+    #     print("Sister server offline")
+
+
     serializer = CasilleroSerializer(casilleros, many=True)
     context = {'casilleros': serializer.data}
     return render(request, 'casilleros_lista.html', context)
@@ -68,22 +93,48 @@ def reservar_casillero(request, casillero_id):
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
 
     if casillero_id is not None:
-        try:
-            casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
+        if casillero_id in [1,2,3]:
+            try:
+                casillero = Casillero.objects.get(id=int(casillero_id), disponible="D")
 
-        except Casillero.DoesNotExist:
-            return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
+            except Casillero.DoesNotExist:
+                return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
 
-        reserva = Reserva(casillero=casillero, usuario=user)
-        reserva.save()
-        casillero.disponible = "R"
-        casillero.clave = generar_clave()
-        print(str(casillero.clave))
-        enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,0]))
-        subject = "Reserva de casillero"
-        message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}.Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por trabajar con nosotros."
-        send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
-        casillero.save()
+            reserva = Reserva(casillero=casillero, usuario=user)
+            reserva.save()
+            casillero.disponible = "R"
+            casillero.clave = generar_clave()
+            print(str(casillero.clave))
+            enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,0]))
+            subject = "Reserva de casillero"
+            message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}.Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por trabajar con nosotros."
+            send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
+            casillero.save()
+
+        if casillero_id in [4,5,6]:
+            try:
+                casillero = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/").json()
+            except Casillero.DoesNotExist:
+                return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            casillero = translate_json456(casillero)
+
+            casillero.fecha_creacion = get_object_or_404(Casillero, id=casillero_id).fecha_creacion
+
+            casillero.save()
+            casillero.id = casillero_id
+            casillero.save()
+            delete_last_casillero(request)
+            requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_reserved_true/")
+            casillero.disponible = "R"
+            casillero.clave = generar_clave()
+            print(str(casillero.clave))
+
+            enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,0]))
+            subject = "Reserva de casillero"
+            message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}.Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por trabajar con nosotros."
+            send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
+            casillero.save()
 
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
@@ -141,6 +192,9 @@ def check_clave_r(request):
             casillero.disponible = "C"
             casillero.abierto = True
             casillero.save()
+            if int(casillero_id) in [4,5,6]:
+                requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_confirmed_true/")
+                requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_locked_false/")
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -166,6 +220,8 @@ def check_clave_l(request):
             casillero.o_email = None
             casillero.o_name = None
             casillero.save()
+            if int(casillero_id) in [4,5,6]:
+                requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_locked_false/")
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -212,7 +268,6 @@ def confirmar_reserva(request):
     except Reserva.DoesNotExist:
         return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
     reserva.confirmada = True
-    reserva.fecha_confirmacion = timezone.now()
     reserva.save()
     return Response({'success': 'Reserva confirmada con éxito'})
 
@@ -229,7 +284,6 @@ def cancelar_reserva(request):
     except Reserva.DoesNotExist:
         return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
     reserva.cancelada = True
-    reserva.fecha_cancelacion = timezone.now()
     reserva.save()
     casillero = reserva.casillero
     casillero.disponible = True
@@ -387,6 +441,20 @@ def ingresar_clave_view(request, casillero_id, clave, opcion):
         return render(request, 'check_clave_l.html', {'casillero_id': casillero_id, 'clave': clave})
 
 def translate_json456(data):
+
+    new_casillero = Casillero(
+    tamano='M',
+    disponible='D',
+    clave=1111,
+    abierto=False,
+    r_username= None,
+    r_email= None,  
+    o_email= None,  
+    o_name = None,
+    fecha_creacion = datetime.today(),  
+    estacion = 2
+)
+
     casillero_id = data.get('id')
     availability = data.get('availability')
     reserved = data.get('reserved')
@@ -397,28 +465,22 @@ def translate_json456(data):
     if casillero_id in [4,5,6]:
         if availability:
             data['disponible'] = "D"
-        elif reserved:
+        if reserved:
             data['disponible'] = "R"
-        elif confirmed:
+        if confirmed:
             data['disponible'] = "C"
-        elif loaded:
+        if loaded:
             data['disponible'] = "A"
 
         if locked == True:
             data['abierto'] = False
-        elif locked == False:
+        if locked == False:
             data['abierto'] = True
+        
+        new_casillero.disponible = data["disponible"]
+        new_casillero.abierto = data["abierto"]
 
-        data.pop('availability', None)
-        data.pop('reserved', None)
-        data.pop('confirmed', None)
-        data.pop('loaded', None)
-        data.pop('opened', None)
-        data.pop('locked', None)
-
-    return data
-
-
+    return new_casillero
 
 def translate_json654(data):
     casillero_id = data.get('id')
@@ -465,8 +527,18 @@ def translate_json654(data):
 
     return data
 
-def reservar_amiwos():
-    response = requests.get('https://tsqrmn8j-8000.brs.devtunnels.ms/stations/2/get_lockers_by_station/')
-    print(response.json())
+# def reservar_amiwos():
+#     response = requests.get('https://tsqrmn8j-8000.brs.devtunnels.ms/stations/2/get_lockers_by_station/')
+#     print(response.json())
     
-reservar_amiwos()
+# reservar_amiwos()
+
+def delete_last_casillero(request):
+
+    last_casillero = Casillero.objects.order_by('id').last()
+
+    if last_casillero:
+        last_casillero.delete()
+        return Response("Last Casillero deleted successfully")
+    else:
+        return Response("No Casillero to delete")

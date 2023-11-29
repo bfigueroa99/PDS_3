@@ -127,7 +127,8 @@ def reservar_amiwos():
 def reservar_nosotros():
     json_data = {'disponible': 'D','abierto': False}
     headers = {'Content-Type': 'application/json'}
-    print(json_data.type)
 
-    response = requests.post(f'http://161.35.0.111:8000/api/casilleros/actualizar/3', json=json_data, headers=headers)
+    response = requests.post(f'http://161.35.0.111:8000/api/casilleros/actualizar/3/', json=json_data, headers=headers)
     print(response.status_code)
+
+reservar_nosotros()
