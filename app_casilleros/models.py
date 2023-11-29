@@ -42,7 +42,7 @@ class Reserva(models.Model):
         self.save()
     
     def agregar_a_bitacora_cargado(self, mensaje):
-        self.bitacora += f"{mensaje} por operador {self.casillero.o_username} el {datetime.now()}.\n"
+        self.bitacora += f"{mensaje} por operador {self.casillero.o_name} el {datetime.now()}.\n"
         self.save()
 
 class Historial(models.Model):
