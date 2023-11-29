@@ -196,9 +196,6 @@ def detalles_casillero(request, casillero_id):
     return render(request, 'detalles_casillero.html', context)
 
 
-
-
-
 @api_view(['POST'])
 def confirmar_reserva(request):
     api_key = request.data.get('api_key')

@@ -35,6 +35,7 @@ class Reserva(models.Model):
     fecha_reserva = models.DateTimeField(null=True, blank=True)
     fecha_carga = models.DateTimeField(null=True, blank=True)
     fecha_retiro = models.DateTimeField(null=True, blank=True)
+    # bitacora = models.TextField(default='')
 
 class Historial(models.Model):
     reserva = models.ForeignKey(Reserva, on_delete=models.CASCADE)
