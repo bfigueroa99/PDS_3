@@ -30,4 +30,5 @@ urlpatterns = [
     path('ingresar-clave/<int:casillero_id>/<str:clave>/<int:opcion>', views.ingresar_clave_view, name='ingresar_clave'),
     path('cancelar_reserva/<int:casillero_id>/', views.cancelar_reserva, name='cancelar_reserva'),
     path('casilleros/force_update/<int:casillero_id>/', views.force_update_casillero, name='force_update_casillero'),
+    path('casilleros/operador_cancelar_reserva/<int:casillero_id>/', views.operador_cancelar_reserva, name='operador_cancelar_reserva')
 ]

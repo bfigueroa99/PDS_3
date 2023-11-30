@@ -164,7 +164,8 @@ def reservar_casillero(request, casillero_id):
         reserva.agregar_a_bitacora_reserva("Reserva realizada")
 
 
-    context = {'casillero_id': casillero_id, "clave": casillero.clave}    
+    context = {'casillero_id': casillero_id, "clave": casillero.clave, 'casillero': casillero}    
+    print(f"Casillero ID: {casillero_id}, Casillero: {casillero}")
     return render(request, 'reservar_casillero.html', context)
 
 
@@ -247,7 +248,6 @@ def check_clave_l(request):
             if not reserva:
                 return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Agregar a la bitácora
             reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
             reserva.save()
 
@@ -552,3 +552,26 @@ def force_update_casillero(request, casillero_id):
     casillero.save()
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
+
+@login_required
+def operador_cancelar_reserva(request, casillero_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    api_key = obtener_api_key(user)
+    try:
+        api_key_obj = ApiKey.objects.get(key=api_key)
+    except ApiKey.DoesNotExist:
+        return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+    casillero = get_object_or_404(Casillero, id=casillero_id)
+    subject = "Cancelacion reserva casillero"
+    message = f"Estimado {casillero.o_name},\n\nLe informamos que su pedido ha sido cancelado, ya que el producto es demasiado grande ser ingresado en un casillero. Para mas informacion, con su proveedor.\n\nMuchas gracias por su preferencia.."
+    send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
+    casillero.disponible = "D"
+    casillero.o_email = None
+    casillero.o_name = None
+    casillero.r_email = None
+    casillero.r_username = None
+    casillero.save()
+    return redirect('casilleros_lista')
+
