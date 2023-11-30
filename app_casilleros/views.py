@@ -382,7 +382,8 @@ def home_view(request):
         reservas = Reserva.objects.filter(casillero=casillero)
         tiempo_promedio_reserva = reservas.aggregate(promedio=Avg(F('fecha_carga') - F('fecha_reserva')))['promedio'] or timedelta()
         tiempo_promedio_carga_retiro = reservas.aggregate(promedio=Avg(F('fecha_retiro') - F('fecha_carga')))['promedio'] or timedelta()
-        uso_porcentaje = reservas.aggregate(promedio=Avg(F('fecha_retiro') - F('fecha_reserva')))['promedio'] or timedelta()
+        tiempo_uso = timezone.now() - casillero.fecha_creacion
+        uso_porcentaje = tiempo_promedio_reserva/tiempo_uso*100
 
         datos_casilleros.append({
             'casillero': casillero,
