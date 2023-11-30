@@ -44,18 +44,32 @@ def casilleros_lista(request):
         locker6 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/6/").json()
         locker4 = translate_json456(locker4)
         locker4.fecha_creacion = get_object_or_404(Casillero, id=4).fecha_creacion
+        locker4.r_username = get_object_or_404(Casillero, id=4).r_username
+        locker4.r_email = get_object_or_404(Casillero, id=4).r_email
+        locker4.o_email = get_object_or_404(Casillero, id=4).o_email
+        locker4.o_name = get_object_or_404(Casillero, id=4).o_name
         locker4.save()
         locker4.id = 4
         locker4.save()
         delete_last_casillero(request)
+
         locker5 = translate_json456(locker5)
         locker5.fecha_creacion = get_object_or_404(Casillero, id=5).fecha_creacion
+        locker5.r_username = get_object_or_404(Casillero, id=5).r_username
+        locker5.r_email = get_object_or_404(Casillero, id=5).r_email
+        locker5.o_email = get_object_or_404(Casillero, id=5).o_email
+        locker5.o_name = get_object_or_404(Casillero, id=5).o_name
         locker5.save()
         locker5.id = 5
         locker5.save()
         delete_last_casillero(request)
+
         locker6 = translate_json456(locker6)
         locker6.fecha_creacion = get_object_or_404(Casillero, id=6).fecha_creacion
+        locker6.r_username = get_object_or_404(Casillero, id=6).r_username
+        locker6.r_email = get_object_or_404(Casillero, id=6).r_email
+        locker6.o_email = get_object_or_404(Casillero, id=6).o_email
+        locker6.o_name = get_object_or_404(Casillero, id=6).o_name
         locker6.save()
         locker6.id = 6
         locker6.save()
