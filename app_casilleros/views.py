@@ -196,15 +196,6 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Obtener la reserva asociada al casillero
-        reserva = Reserva.objects.filter(casillero=casillero, usuario=user).first()
-
-        if not reserva:
-            return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Agregar a la bitácora
-        reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
-        reserva.save()
 
         context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
@@ -238,6 +229,7 @@ def check_clave_r(request):
     
 @login_required
 def check_clave_l(request):
+    user = request.user
     if request.method == 'POST':
         inputted_clave = request.POST.get('inputted_clave')
         casillero_id = request.POST.get('casillero_id')
@@ -249,6 +241,16 @@ def check_clave_l(request):
 
         if str(inputted_clave) == str(casillero.clave):
             # casillero.disponible = "D"
+                    # Obtener la reserva asociada al casillero
+            reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
+
+            if not reserva:
+                return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Agregar a la bitácora
+            reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
+            reserva.save()
+
             casillero.abierto = True
             casillero.r_email = None
             casillero.r_username = None
@@ -258,16 +260,6 @@ def check_clave_l(request):
             if int(casillero_id) in [4,5,6]:
                 requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_availability/")
                 requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_locked_false/")
-            
-            # Obtener la reserva asociada al casillero
-            reserva = Reserva.objects.filter(casillero=casillero).first()
-
-            if not reserva:
-                return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Agregar a la bitácora
-            reserva.agregar_a_bitacora_cargado("Carga Realizada")
-            reserva.save()
             
             return JsonResponse({'correct': True})
         else:
@@ -402,25 +394,29 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
 
     nuevo_estado = request.data.get('disponible')
     nuevo_abierto =  request.data.get('abierto')
-    casillero.disponible = nuevo_estado
-    casillero.abierto = nuevo_abierto
-    casillero.clave = generar_clave()
-    print(str(casillero.clave))
-    enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,1]))
-    subject = "Carga de casillero"
-    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por su preferencia."
-    send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
-    casillero.save()
+    if casillero.disponible == "C" and nuevo_estado == "A":
+        
+        casillero.disponible = nuevo_estado
+        casillero.abierto = nuevo_abierto
+        casillero.clave = generar_clave()
+        print(str(casillero.clave))
+        enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,1]))
+        subject = "Carga de casillero"
+        message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por su preferencia."
+        send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
+        casillero.save()
 
+        reserva = Reserva.objects.filter(casillero=casillero).last()
+        if not reserva:
+            return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+        reserva.agregar_a_bitacora_cargado("Carga Realizada")
+        reserva.save()
+    
+    if casillero.disponible == "A" and nuevo_estado == "D":
+        casillero.disponible = nuevo_estado
+        casillero.abierto = nuevo_abierto
+        casillero.save()
 
-    if casillero.disponible == "A":
-        # casillero.abierto = False
-        # casillero.save()
-        pass
-    elif casillero.disponible == "D":
-        # casillero.abierto = False
-        # casillero.save()
-        pass
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
 
