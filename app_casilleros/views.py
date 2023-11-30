@@ -48,6 +48,7 @@ def casilleros_lista(request):
         locker4.r_email = get_object_or_404(Casillero, id=4).r_email
         locker4.o_email = get_object_or_404(Casillero, id=4).o_email
         locker4.o_name = get_object_or_404(Casillero, id=4).o_name
+        locker4.clave = get_object_or_404(Casillero, id=4).clave
         locker4.save()
         locker4.id = 4
         locker4.save()
@@ -59,6 +60,7 @@ def casilleros_lista(request):
         locker5.r_email = get_object_or_404(Casillero, id=5).r_email
         locker5.o_email = get_object_or_404(Casillero, id=5).o_email
         locker5.o_name = get_object_or_404(Casillero, id=5).o_name
+        locker5.clave = get_object_or_404(Casillero, id=5).clave
         locker5.save()
         locker5.id = 5
         locker5.save()
@@ -70,6 +72,7 @@ def casilleros_lista(request):
         locker6.r_email = get_object_or_404(Casillero, id=6).r_email
         locker6.o_email = get_object_or_404(Casillero, id=6).o_email
         locker6.o_name = get_object_or_404(Casillero, id=6).o_name
+        locker6.clave = get_object_or_404(Casillero, id=6).clave
         locker6.save()
         locker6.id = 6
         locker6.save()
@@ -139,6 +142,7 @@ def reservar_casillero(request, casillero_id):
             casillero.r_email = get_object_or_404(Casillero, id=casillero_id).r_email
             casillero.o_email = get_object_or_404(Casillero, id=casillero_id).o_email
             casillero.o_name = get_object_or_404(Casillero, id=casillero_id).o_name
+            casillero.clave = get_object_or_404(Casillero, id=casillero_id).clave
 
             casillero.save()
             casillero.id = casillero_id
@@ -473,8 +477,6 @@ def form_reserva(request, casillero_id):
 
 @login_required
 def ingresar_clave_view(request, casillero_id, clave, opcion):
-    # Lógica para verificar la clave y realizar las acciones correspondientes
-    # Puedes redirigir a otra página o mostrar un mensaje de éxito aquí
     if opcion == 0:
         return render(request, 'check_clave_r.html', {'casillero_id': casillero_id, 'clave': clave})
     if opcion == 1:
