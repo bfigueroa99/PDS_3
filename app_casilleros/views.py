@@ -196,15 +196,6 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Obtener la reserva asociada al casillero
-        reserva = Reserva.objects.filter(casillero=casillero, usuario=user).first()
-
-        if not reserva:
-            return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Agregar a la bitácora
-        reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
-        reserva.save()
 
         context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
@@ -238,6 +229,7 @@ def check_clave_r(request):
     
 @login_required
 def check_clave_l(request):
+    user = request.user
     if request.method == 'POST':
         inputted_clave = request.POST.get('inputted_clave')
         casillero_id = request.POST.get('casillero_id')
@@ -249,6 +241,16 @@ def check_clave_l(request):
 
         if str(inputted_clave) == str(casillero.clave):
             # casillero.disponible = "D"
+                    # Obtener la reserva asociada al casillero
+            reserva = Reserva.objects.filter(casillero=casillero, usuario=user).first()
+
+            if not reserva:
+                return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Agregar a la bitácora
+            reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
+            reserva.save()
+
             casillero.abierto = True
             casillero.r_email = None
             casillero.r_username = None
