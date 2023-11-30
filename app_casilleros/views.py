@@ -367,7 +367,7 @@ def home_view(request):
         # Obtener métricas generales
     total_casilleros = Casillero.objects.count()
     reservas_pendientes = Reserva.objects.filter(fecha_retiro__isnull=True).count()
-    paquetes_no_retirados = Reserva.objects.filter(fecha_retiro__isnull=False, fecha_carga__isnull=False).count()
+    # paquetes_no_retirados = Reserva.objects.filter(fecha_retiro__isnull=False, fecha_carga__isnull=False).count()
 
     # Obtener métricas por casillero
     casilleros = Casillero.objects.all()
@@ -397,7 +397,7 @@ def home_view(request):
         'total_reservas': total_reservas,
         'total_casilleros': total_casilleros,
         'reservas_pendientes': reservas_pendientes,
-        'paquetes_no_retirados': paquetes_no_retirados,
+        # 'paquetes_no_retirados': paquetes_no_retirados,
         'datos_casilleros': datos_casilleros,
         'tiempo_promedio_reserva_ultima_semana': tiempo_promedio_reserva_ultima_semana,
         'tiempo_promedio_carga_retiro_ultima_semana': tiempo_promedio_carga_retiro_ultima_semana,
