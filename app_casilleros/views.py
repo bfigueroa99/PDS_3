@@ -394,7 +394,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
 
     nuevo_estado = request.data.get('disponible')
     nuevo_abierto =  request.data.get('abierto')
-    if casillero.disponible == "C":
+    if casillero.disponible == "C" and nuevo_estado == "A":
         
         casillero.disponible = nuevo_estado
         casillero.abierto = nuevo_abierto
@@ -411,7 +411,11 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
             return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
         reserva.agregar_a_bitacora_cargado("Carga Realizada")
         reserva.save()
-
+    
+    if casillero.disponible == "A" and nuevo_estado == "D":
+        casillero.disponible = nuevo_estado
+        casillero.abierto = nuevo_abierto
+        casillero.save()
 
 
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
