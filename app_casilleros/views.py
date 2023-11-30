@@ -261,16 +261,6 @@ def check_clave_l(request):
                 requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_availability/")
                 requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_locked_false/")
             
-            # Obtener la reserva asociada al casillero
-            reserva = Reserva.objects.filter(casillero=casillero).first()
-
-            if not reserva:
-                return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Agregar a la bitácora
-            reserva.agregar_a_bitacora_cargado("Carga Realizada")
-            reserva.save()
-            
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
@@ -413,6 +403,15 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
+
+    reserva = Reserva.objects.filter(casillero=casillero).first()
+
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Agregar a la bitácora
+    reserva.agregar_a_bitacora_cargado("Carga Realizada")
+    reserva.save()
 
 
     if casillero.disponible == "A":
