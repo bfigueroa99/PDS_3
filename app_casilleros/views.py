@@ -42,47 +42,47 @@ class MyApiView(APIView):
 @api_view(['GET'])
 def casilleros_lista(request):
     casilleros = Casillero.objects.all()
-    try:
-        locker4 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/4/").json()
-        locker5 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/5/").json()
-        locker6 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/6/").json()
-        locker4 = translate_json456(locker4)
-        locker4.fecha_creacion = get_object_or_404(Casillero, id=4).fecha_creacion
-        locker4.r_username = get_object_or_404(Casillero, id=4).r_username
-        locker4.r_email = get_object_or_404(Casillero, id=4).r_email
-        locker4.o_email = get_object_or_404(Casillero, id=4).o_email
-        locker4.o_name = get_object_or_404(Casillero, id=4).o_name
-        locker4.clave = get_object_or_404(Casillero, id=4).clave
-        locker4.save()
-        locker4.id = 4
-        locker4.save()
-        delete_last_casillero(request)
+    # try:
+    #     locker4 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/4/").json()
+    #     locker5 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/5/").json()
+    #     locker6 = requests.get(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/6/").json()
+    #     locker4 = translate_json456(locker4)
+    #     locker4.fecha_creacion = get_object_or_404(Casillero, id=4).fecha_creacion
+    #     locker4.r_username = get_object_or_404(Casillero, id=4).r_username
+    #     locker4.r_email = get_object_or_404(Casillero, id=4).r_email
+    #     locker4.o_email = get_object_or_404(Casillero, id=4).o_email
+    #     locker4.o_name = get_object_or_404(Casillero, id=4).o_name
+    #     locker4.clave = get_object_or_404(Casillero, id=4).clave
+    #     locker4.save()
+    #     locker4.id = 4
+    #     locker4.save()
+    #     delete_last_casillero(request)
 
-        locker5 = translate_json456(locker5)
-        locker5.fecha_creacion = get_object_or_404(Casillero, id=5).fecha_creacion
-        locker5.r_username = get_object_or_404(Casillero, id=5).r_username
-        locker5.r_email = get_object_or_404(Casillero, id=5).r_email
-        locker5.o_email = get_object_or_404(Casillero, id=5).o_email
-        locker5.o_name = get_object_or_404(Casillero, id=5).o_name
-        locker5.clave = get_object_or_404(Casillero, id=5).clave
-        locker5.save()
-        locker5.id = 5
-        locker5.save()
-        delete_last_casillero(request)
+    #     locker5 = translate_json456(locker5)
+    #     locker5.fecha_creacion = get_object_or_404(Casillero, id=5).fecha_creacion
+    #     locker5.r_username = get_object_or_404(Casillero, id=5).r_username
+    #     locker5.r_email = get_object_or_404(Casillero, id=5).r_email
+    #     locker5.o_email = get_object_or_404(Casillero, id=5).o_email
+    #     locker5.o_name = get_object_or_404(Casillero, id=5).o_name
+    #     locker5.clave = get_object_or_404(Casillero, id=5).clave
+    #     locker5.save()
+    #     locker5.id = 5
+    #     locker5.save()
+    #     delete_last_casillero(request)
 
-        locker6 = translate_json456(locker6)
-        locker6.fecha_creacion = get_object_or_404(Casillero, id=6).fecha_creacion
-        locker6.r_username = get_object_or_404(Casillero, id=6).r_username
-        locker6.r_email = get_object_or_404(Casillero, id=6).r_email
-        locker6.o_email = get_object_or_404(Casillero, id=6).o_email
-        locker6.o_name = get_object_or_404(Casillero, id=6).o_name
-        locker6.clave = get_object_or_404(Casillero, id=6).clave
-        locker6.save()
-        locker6.id = 6
-        locker6.save()
-        delete_last_casillero(request)
-    except:
-        print("Sister server offline")
+    #     locker6 = translate_json456(locker6)
+    #     locker6.fecha_creacion = get_object_or_404(Casillero, id=6).fecha_creacion
+    #     locker6.r_username = get_object_or_404(Casillero, id=6).r_username
+    #     locker6.r_email = get_object_or_404(Casillero, id=6).r_email
+    #     locker6.o_email = get_object_or_404(Casillero, id=6).o_email
+    #     locker6.o_name = get_object_or_404(Casillero, id=6).o_name
+    #     locker6.clave = get_object_or_404(Casillero, id=6).clave
+    #     locker6.save()
+    #     locker6.id = 6
+    #     locker6.save()
+    #     delete_last_casillero(request)
+    # except:
+    #     print("Sister server offline")
 
 
     serializer = CasilleroSerializer(casilleros, many=True)
@@ -171,7 +171,8 @@ def reservar_casillero(request, casillero_id):
 
 
 
-    context = {'casillero_id': casillero_id, "clave": casillero.clave}    
+    context = {'casillero_id': casillero_id, "clave": casillero.clave, 'casillero': casillero}    
+    print(f"Casillero ID: {casillero_id}, Casillero: {casillero}")
     return render(request, 'reservar_casillero.html', context)
 
 
@@ -254,7 +255,6 @@ def check_clave_l(request):
             if not reserva:
                 return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Agregar a la bitácora
             reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
             reserva.save()
             reserva.fecha_retiro = datetime.now()  # Añade la fecha de reserva
@@ -318,24 +318,30 @@ def confirmar_reserva(request):
     reserva.save()
     return Response({'success': 'Reserva confirmada con éxito'})
 
-@api_view(['POST'])
-def cancelar_reserva(request):
-    api_key = request.data.get('api_key')
-    reserva_id = request.data.get('reserva_id')
+@login_required
+def cancelar_reserva(request, casillero_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    api_key = obtener_api_key(user)
     try:
         api_key_obj = ApiKey.objects.get(key=api_key)
     except ApiKey.DoesNotExist:
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
-    try:
-        reserva = Reserva.objects.get(id=reserva_id, usuario=api_key_obj.usuario, confirmada=False, cancelada=False)
-    except Reserva.DoesNotExist:
-        return Response({'error': 'Reserva no encontrada o ya confirmada/cancelada'}, status=status.HTTP_400_BAD_REQUEST)
-    reserva.cancelada = True
-    reserva.save()
-    casillero = reserva.casillero
-    casillero.disponible = True
+    casillero = get_object_or_404(Casillero, id=casillero_id)
+    casillero.disponible = "D"
+    casillero.o_email = None
+    casillero.o_name = None
+    casillero.r_email = None
+    casillero.r_username = None
     casillero.save()
-    return Response({'success': 'Reserva cancelada con éxito'})
+
+    reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+    reserva.bitacora += f"Reserva cancelada por administrador {user.username} el {datetime.now()}.\n"
+    reserva.save()
+    return redirect('casilleros_lista')
 
 @api_view(['POST'])
 def estado_reserva(request):
@@ -573,57 +579,6 @@ def translate_json456(data):
 
     return new_casillero
 
-def translate_json654(data):
-    casillero_id = data.get('id')
-    disponible = data.get('disponible')
-    abierto = data.get('abierto')
-
-    if casillero_id in [4,5,6]:
-        if disponible == "D":
-            data['availability'] = True
-            data['reserved'] = False
-            data['confirmed'] = False
-            data['loaded'] = False
-        elif disponible == "R":
-            data['availability'] = False
-            data['reserved'] = True
-            data['confirmed'] = False
-            data['loaded'] = False
-        elif disponible == "C":
-            data['availability'] = False
-            data['reserved'] = False
-            data['confirmed'] = True
-            data['loaded'] = False
-        elif disponible == "A":
-            data['availability'] = False
-            data['reserved'] = False
-            data['confirmed'] = False
-            data['loaded'] = True
-
-        if abierto == True:
-            data['locked'] = False
-        elif abierto == False:
-            data['locked'] = True
-
-        data['height'] = 26.0
-        data['width'] = 43.0
-
-        data.pop('disponible', None)
-        data.pop('abierto', None)
-        data.pop('o_email', None)
-        data.pop('r_email', None)
-        data.pop('r_username', None)
-        data.pop('o_name', None)
-        data.pop('tamano', None)
-
-    return data
-
-# def reservar_amiwos():
-#     response = requests.get('https://tsqrmn8j-8000.brs.devtunnels.ms/stations/2/get_lockers_by_station/')
-#     print(response.json())
-    
-# reservar_amiwos()
-
 def delete_last_casillero(request):
 
     last_casillero = Casillero.objects.order_by('id').last()
@@ -640,3 +595,46 @@ def detalles_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
     context = {'reserva': reserva}
     return render(request, 'detalles_reserva.html', context)
+
+@api_view(['POST'])
+def force_update_casillero(request, casillero_id):
+    try:
+        casillero = Casillero.objects.get(id=casillero_id)
+    except Casillero.DoesNotExist:
+        return Response({'error': 'Casillero no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    casillero.disponible = request.data.get('disponible')
+    casillero.abierto =  request.data.get('abierto')
+    casillero.save()
+
+    return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
+
+@login_required
+def operador_cancelar_reserva(request, casillero_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    api_key = obtener_api_key(user)
+    try:
+        api_key_obj = ApiKey.objects.get(key=api_key)
+    except ApiKey.DoesNotExist:
+        return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
+    casillero = get_object_or_404(Casillero, id=casillero_id)
+    subject = "Cancelacion reserva casillero"
+    message = f"Estimado {casillero.o_name},\n\nLe informamos que su pedido ha sido cancelado, ya que el producto es demasiado grande ser ingresado en un casillero. Para mas informacion, contactese con con su proveedor.\n\nMuchas gracias por su preferencia.."
+    send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
+    reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+    reserva.bitacora += f"Reserva cancelada por operador {casillero.o_name}, debido a exceso de tamaño, el {datetime.now()}.\n"
+    reserva.save()
+    casillero.disponible = "D"
+    casillero.o_email = None
+    casillero.o_name = None
+    casillero.r_email = None
+    casillero.r_username = None
+    casillero.save()
+
+    return redirect('casilleros_lista')
+
+

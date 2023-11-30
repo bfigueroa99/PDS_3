@@ -12,6 +12,14 @@
 
         <a href="{% url 'casilleros_lista' %}" class="btn btn-primary">Volver a la lista de casilleros disponibles</a>
     </div>
+    <br>
+    <div class="text-center">
+        <h5 style="color: #be2a2a;">En caso de que el paquete sea demasiado grande para ingresar en el casillero, oprimir el siguiente boton:</h5>
+        <form action="{% if casillero and casillero.id %}{% url 'operador_cancelar_reserva' casillero.id %}{% endif %}" method="post" class="d-inline-block mx-auto">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
+        </form>
+    </div>    
     <div id="content2">
         {% include 'check_clave_r.html' %}
     </div>
