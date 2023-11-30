@@ -17,6 +17,10 @@ from django.urls import reverse
 import requests
 import ujson
 from datetime import datetime
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count, Avg, F, ExpressionWrapper, fields
+
 
 
 
@@ -162,6 +166,9 @@ def reservar_casillero(request, casillero_id):
         reserva = Reserva(casillero=casillero, usuario=user, fecha_reserva=datetime.now())
         reserva.save()
         reserva.agregar_a_bitacora_reserva("Reserva realizada")
+        reserva.fecha_reserva = datetime.now()  # Añade la fecha de reserva
+        reserva.save()
+
 
 
     context = {'casillero_id': casillero_id, "clave": casillero.clave, 'casillero': casillero}    
@@ -244,11 +251,13 @@ def check_clave_l(request):
             # casillero.disponible = "D"
                     # Obtener la reserva asociada al casillero
             reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
-
+            reserva.save()
             if not reserva:
                 return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
 
             reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
+            reserva.save()
+            reserva.fecha_retiro = datetime.now()  # Añade la fecha de reserva
             reserva.save()
 
             casillero.abierto = True
@@ -360,7 +369,46 @@ def estado_reserva(request):
 @login_required
 def home_view(request):
     user = request.user
-    context = {'user_name': user.username}
+    total_reservas = Reserva.objects.count()
+        # Obtener métricas generales
+    total_casilleros = Casillero.objects.count()
+    reservas_pendientes = Reserva.objects.filter(fecha_retiro__isnull=True).count()
+    paquetes_no_retirados = Reserva.objects.filter(fecha_retiro__isnull=False, fecha_carga__isnull=False).count()
+
+    # Obtener métricas por casillero
+    casilleros = Casillero.objects.all()
+    datos_casilleros = []
+    for casillero in casilleros:
+        reservas = Reserva.objects.filter(casillero=casillero)
+        tiempo_promedio_reserva = reservas.aggregate(promedio=Avg(F('fecha_carga') - F('fecha_reserva')))['promedio'] or timedelta()
+        tiempo_promedio_carga_retiro = reservas.aggregate(promedio=Avg(F('fecha_retiro') - F('fecha_carga')))['promedio'] or timedelta()
+        uso_porcentaje = (reservas.count() / total_casilleros) * 100 if total_casilleros > 0 else 0
+
+        datos_casilleros.append({
+            'casillero': casillero,
+            'tiempo_promedio_reserva': tiempo_promedio_reserva,
+            'tiempo_promedio_carga_retiro': tiempo_promedio_carga_retiro,
+            'uso_porcentaje': uso_porcentaje,
+        })
+
+    # Obtener métricas por tiempo
+    fecha_limite = timezone.now() - timedelta(days=7)  # Puedes ajustar el rango de tiempo según tus necesidades
+    reservas_ultima_semana = Reserva.objects.filter(fecha_reserva__gte=fecha_limite)
+
+    tiempo_promedio_reserva_ultima_semana = reservas_ultima_semana.aggregate(promedio=Avg(F('fecha_carga') - F('fecha_reserva')))['promedio'] or timedelta()
+    tiempo_promedio_carga_retiro_ultima_semana = reservas_ultima_semana.aggregate(promedio=Avg(F('fecha_retiro') - F('fecha_carga')))['promedio'] or timedelta()
+
+    context = {
+        'user_name': user.username, 
+        'total_reservas': total_reservas,
+        'total_casilleros': total_casilleros,
+        'reservas_pendientes': reservas_pendientes,
+        'paquetes_no_retirados': paquetes_no_retirados,
+        'datos_casilleros': datos_casilleros,
+        'tiempo_promedio_reserva_ultima_semana': tiempo_promedio_reserva_ultima_semana,
+        'tiempo_promedio_carga_retiro_ultima_semana': tiempo_promedio_carga_retiro_ultima_semana,
+    }
+
     return render(request, 'home.html', context)
 
 def obtener_reservas_usuario(request, usuario_id):
@@ -413,9 +461,11 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
         casillero.save()
 
         reserva = Reserva.objects.filter(casillero=casillero).last()
+        reserva.save()
         if not reserva:
             return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
         reserva.agregar_a_bitacora_cargado("Carga Realizada")
+        reserva.fecha_carga = datetime.now()
         reserva.save()
     
     if casillero.disponible == "A" and nuevo_estado == "D":
@@ -586,4 +636,5 @@ def operador_cancelar_reserva(request, casillero_id):
     casillero.save()
 
     return redirect('casilleros_lista')
+
 

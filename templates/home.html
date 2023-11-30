@@ -12,6 +12,36 @@
         <p>This is your home page content.</p><br>
         <a href="{% url 'casilleros_lista' %}" class="btn btn-primary">View Available Casilleros</a>
     </div>
+    <!-- dashboard.html -->
+
+        <h1>Dashboard</h1>
+
+        <p>Total de casilleros: {{ total_casilleros }}</p>
+        <p>Reservas pendientes: {{ reservas_pendientes }}</p>
+        <p>Paquetes no retirados: {{ paquetes_no_retirados }}</p>
+
+        <h2>Métricas por Casillero</h2>
+        <table border="1">
+            <tr>
+                <th>Casillero</th>
+                <th>Tiempo Promedio Reserva</th>
+                <th>Tiempo Promedio Carga a Retiro</th>
+                <th>Uso Porcentaje</th>
+            </tr>
+            {% for datos_casillero in datos_casilleros %}
+            <tr>
+                <td>{{ datos_casillero.casillero.id }}</td>
+                <td>{{ datos_casillero.tiempo_promedio_reserva }}</td>
+                <td>{{ datos_casillero.tiempo_promedio_carga_retiro }}</td>
+                <td>{{ datos_casillero.uso_porcentaje }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Métricas por Tiempo (Última Semana)</h2>
+        <p>Tiempo Promedio Reserva: {{ tiempo_promedio_reserva_ultima_semana }}</p>
+        <p>Tiempo Promedio Carga a Retiro: {{ tiempo_promedio_carga_retiro_ultima_semana }}</p>
     {% endblock %}
+    
 </body>
 </html>
