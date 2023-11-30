@@ -326,6 +326,12 @@ def cancelar_reserva(request, casillero_id):
     casillero.r_email = None
     casillero.r_username = None
     casillero.save()
+
+    reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+    reserva.bitacora += f"Reserva cancelada por administrador {user.username} el {datetime.now()}.\n"
+    reserva.save()
     return redirect('casilleros_lista')
 
 @api_view(['POST'])
@@ -565,13 +571,19 @@ def operador_cancelar_reserva(request, casillero_id):
         return Response({'error': 'API key inválida'}, status=status.HTTP_401_UNAUTHORIZED)
     casillero = get_object_or_404(Casillero, id=casillero_id)
     subject = "Cancelacion reserva casillero"
-    message = f"Estimado {casillero.o_name},\n\nLe informamos que su pedido ha sido cancelado, ya que el producto es demasiado grande ser ingresado en un casillero. Para mas informacion, con su proveedor.\n\nMuchas gracias por su preferencia.."
+    message = f"Estimado {casillero.o_name},\n\nLe informamos que su pedido ha sido cancelado, ya que el producto es demasiado grande ser ingresado en un casillero. Para mas informacion, contactese con con su proveedor.\n\nMuchas gracias por su preferencia.."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
+    reserva = Reserva.objects.filter(casillero=casillero, usuario=user).last()
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+    reserva.bitacora += f"Reserva cancelada por operador {casillero.o_name}, debido a exceso de tamaño, el {datetime.now()}.\n"
+    reserva.save()
     casillero.disponible = "D"
     casillero.o_email = None
     casillero.o_name = None
     casillero.r_email = None
     casillero.r_username = None
     casillero.save()
+
     return redirect('casilleros_lista')
 
