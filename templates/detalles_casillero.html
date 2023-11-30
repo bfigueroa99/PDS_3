@@ -2,30 +2,44 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles del Casillero</title>
 </head>
+
 <body>
     {% block content %}
-        <h1>Detalles del Casillero</h1>
-        {% if casillero %}
+    <h1>Detalles del Casillero</h1>
+    {% if casillero %}
+    <ul>
+        <li><strong>Tamaño:</strong> {{ casillero.get_tamano_display }}</li>
+        <li><strong>Disponibilidad:</strong> {{ casillero.get_disponible_display }}</li>
+        <li><strong>Clave:</strong> {{ casillero.clave }}</li>
+        <li><strong>Abierto:</strong> {{ casillero.abierto }}</li>
+        <li><strong>Usuario Reservado:</strong> {{ casillero.r_username }}</li>
+        <li><strong>Email Reservado:</strong> {{ casillero.r_email }}</li>
+        <li><strong>Email del Propietario:</strong> {{ casillero.o_email }}</li>
+        <li><strong>Nombre del Propietario:</strong> {{ casillero.o_name }}</li>
+        <li><strong>Fecha de Creación:</strong> {{ casillero.fecha_creacion }}</li>
+        <li><strong>Estacion:</strong> {{ casillero.estacion }}</li>
+    </ul>
+    <p>Reservas:</p>
+    <ul>
+        {% for reserva in reservas %}
+        <li>
             <ul>
-                <li><strong>Tamaño:</strong> {{ casillero.get_tamano_display }}</li>
-                <li><strong>Disponibilidad:</strong> {{ casillero.get_disponible_display }}</li>
-                <li><strong>Clave:</strong> {{ casillero.clave }}</li>
-                <li><strong>Abierto:</strong> {{ casillero.abierto }}</li>
-                <li><strong>Usuario Reservado:</strong> {{ casillero.r_username }}</li>
-                <li><strong>Email Reservado:</strong> {{ casillero.r_email }}</li>
-                <li><strong>Email del Propietario:</strong> {{ casillero.o_email }}</li>
-                <li><strong>Nombre del Propietario:</strong> {{ casillero.o_name }}</li>
-                <li><strong>Fecha de Creación:</strong> {{ casillero.fecha_creacion }}</li>
-                <li><strong>Estacion:</strong> {{ casillero.estacion }}</li>
+                <pre>{{ reserva.bitacora }}</pre>
             </ul>
-        {% else %}
-            <p>El casillero no existe o no se encontró.</p>
-        {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>El casillero no existe o no se encontró.</p>
+    {% endif %}
+
     {% endblock %}
 </body>
+
 </html>
