@@ -102,9 +102,7 @@ def reservar_casillero(request, casillero_id):
 
             except Casillero.DoesNotExist:
                 return Response({'error': 'Casillero no disponible'}, status=status.HTTP_400_BAD_REQUEST)
-
-            reserva = Reserva(casillero=casillero, usuario=user)
-            reserva.save()
+            
             casillero.disponible = "R"
             casillero.clave = generar_clave()
             print(str(casillero.clave))
@@ -138,6 +136,11 @@ def reservar_casillero(request, casillero_id):
             message = f"Estimado {casillero.o_name},\n\nLe informamos que un pedido ha sido reservado para en el casillero N°{casillero_id}.Para abrir y depositar el pedido, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por trabajar con nosotros."
             send_mail(subject,message,'saccnotification@gmail.com',[casillero.o_email])
             casillero.save()
+        
+        reserva = Reserva(casillero=casillero, usuario=user, fecha_reserva=datetime.now())
+        reserva.save()
+        reserva.agregar_a_bitacora_reserva("Reserva realizada")
+
 
     context = {'casillero_id': casillero_id, "clave": casillero.clave}    
     return render(request, 'reservar_casillero.html', context)
@@ -171,8 +174,15 @@ def liberar_casillero(request):
         except Casillero.DoesNotExist:
             return Response({'error': 'Casillero not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # casillero.clave = generar_clave()
-        # casillero.save()
+        # Obtener la reserva asociada al casillero
+        reserva = Reserva.objects.filter(casillero=casillero, usuario=user).first()
+
+        if not reserva:
+            return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Agregar a la bitácora
+        reserva.bitacora += f"Liberación realizada por cliente {casillero.r_username} el {datetime.now()}.\n"
+        reserva.save()
 
         context = {'casillero_id': casillero_id, "clave": casillero.clave}     
         return render(request, 'liberar_casillero.html', context)
@@ -251,11 +261,10 @@ def correct_clave(request):
 @login_required
 def detalles_casillero(request, casillero_id):
     casillero = get_object_or_404(Casillero, id=casillero_id)
-    context = {'casillero': casillero}
+    reservas = Reserva.objects.filter(casillero=casillero).all()
+
+    context = {'casillero': casillero, 'reservas': reservas}
     return render(request, 'detalles_casillero.html', context)
-
-
-
 
 
 @api_view(['POST'])
@@ -349,7 +358,7 @@ def obtener_api_key_usuario(request):
         return JsonResponse({'api_key': api_key})
     else:
         return JsonResponse({'message': 'API key no encontrada'})
-    
+
 @api_view(['POST'])
 def actualizar_disponibilidad_casillero(request, casillero_id):
     try:
@@ -368,6 +377,16 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
+
+    # Obtener la reserva asociada al casillero
+    reserva = Reserva.objects.filter(casillero=casillero).first()
+
+    if not reserva:
+        return Response({'error': 'Reserva not found for the current user'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Agregar a la bitácora
+    reserva.agregar_a_bitacora_cargado("Carga Realizada")
+    reserva.save()
 
     if casillero.disponible == "A":
         # casillero.abierto = False
@@ -545,3 +564,10 @@ def delete_last_casillero(request):
         return Response("Last Casillero deleted successfully")
     else:
         return Response("No Casillero to delete")
+    
+
+@login_required
+def detalles_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    context = {'reserva': reserva}
+    return render(request, 'detalles_reserva.html', context)
