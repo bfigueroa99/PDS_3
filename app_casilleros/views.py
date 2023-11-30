@@ -490,6 +490,11 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
         casillero.abierto = nuevo_abierto
         casillero.save()
 
+    if casillero.disponible == "C" and nuevo_estado == "C" and nuevo_abierto == True:
+        casillero.disponible = nuevo_estado
+        casillero.abierto = nuevo_abierto
+        casillero.save()
+
     return Response({'success': 'Disponibilidad del casillero actualizada con éxito'})
 
 @api_view(['POST'])
