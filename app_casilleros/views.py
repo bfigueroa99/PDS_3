@@ -123,6 +123,10 @@ def reservar_casillero(request, casillero_id):
             casillero = translate_json456(casillero)
 
             casillero.fecha_creacion = get_object_or_404(Casillero, id=casillero_id).fecha_creacion
+            casillero.r_username = get_object_or_404(Casillero, id=casillero_id).r_username
+            casillero.r_email = get_object_or_404(Casillero, id=casillero_id).r_email
+            casillero.o_email = get_object_or_404(Casillero, id=casillero_id).o_email
+            casillero.o_name = get_object_or_404(Casillero, id=casillero_id).o_name
 
             casillero.save()
             casillero.id = casillero_id
