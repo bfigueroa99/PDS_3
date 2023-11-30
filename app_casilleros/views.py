@@ -256,7 +256,9 @@ def check_clave_l(request):
             casillero.o_name = None
             casillero.save()
             if int(casillero_id) in [4,5,6]:
+                requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_availability/")
                 requests.put(f"https://tsqrmn8j-8000.brs.devtunnels.ms/lockers/{casillero_id}/update_locked_false/")
+            
             return JsonResponse({'correct': True})
         else:
             return JsonResponse({'correct': False})
