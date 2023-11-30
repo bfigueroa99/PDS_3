@@ -55,6 +55,13 @@
                     {% endif %}
                     <br>
                     <a href="{% url 'detalles_casillero' casillero.id %}" class="btn btn-info">Ver detalle del casillero</a>
+                    <br>
+                    {% if casillero.disponible == 'R' %}
+                    <form action="{% url 'cancelar_reserva' casillero.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
+                    </form>
+                    {% endif %}
                 </li>
                 <hr>
             {% empty %}
