@@ -19,8 +19,12 @@ import ujson
 from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Count, Avg, F, ExpressionWrapper, fields
-
+from django.db.models import Count, Avg, F, ExpressionWrapper, fields, Sum
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import CustomUserCreationForm
 
 
 
@@ -382,8 +386,9 @@ def home_view(request):
         reservas = Reserva.objects.filter(casillero=casillero)
         tiempo_promedio_reserva = reservas.aggregate(promedio=Avg(F('fecha_carga') - F('fecha_reserva')))['promedio'] or timedelta()
         tiempo_promedio_carga_retiro = reservas.aggregate(promedio=Avg(F('fecha_retiro') - F('fecha_carga')))['promedio'] or timedelta()
-        tiempo_uso = timezone.now() - casillero.fecha_creacion
-        uso_porcentaje = tiempo_promedio_reserva/tiempo_uso*100
+        sumatoria_tiempo_uso = reservas.aggregate(sumatoria=Sum(F('fecha_retiro') - F('fecha_reserva')))['sumatoria'] or timedelta()
+        uso_porcentaje = sumatoria_tiempo_uso / (timezone.now() - casillero.fecha_creacion)
+        
 
         datos_casilleros.append({
             'casillero': casillero,
@@ -639,3 +644,17 @@ def operador_cancelar_reserva(request, casillero_id):
     return redirect('casilleros_lista')
 
 
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}!')
+
+            login(request, user)
+
+            return redirect('home')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'register.html', {'form': form})
