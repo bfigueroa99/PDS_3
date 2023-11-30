@@ -371,7 +371,7 @@ def actualizar_disponibilidad_casillero(request, casillero_id):
     print(str(casillero.clave))
     enlace = request.build_absolute_uri(reverse('ingresar_clave', args=[casillero_id, casillero.clave,1]))
     subject = "Carga de casillero"
-    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\nMuchas gracias por su preferencia."
+    message = f"Estimado {casillero.r_username},\n\nLe informamos que su pedido ha sido exitosamente cargado en el casillero N°{casillero_id}. Para retirarlo, ingrese el siguiente codigo en el casillero: '{casillero.clave}'.\n\n {enlace} \n\nMuchas gracias por su preferencia."
     send_mail(subject,message,'saccnotification@gmail.com',[casillero.r_email])
     casillero.save()
 
