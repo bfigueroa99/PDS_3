@@ -25,6 +25,7 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from faker import Faker
 
 
 
@@ -645,11 +646,19 @@ def operador_cancelar_reserva(request, casillero_id):
 
 
 def register(request):
+    fake = Faker()
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
             username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password1')  # Assuming password1 is the password field
+            user = User.objects.create_user(username=username, email=email, password=password)
+
+            # Create API key
+            api_key = str(fake.uuid4())
+            ApiKey.objects.create(usuario=user, key=api_key)
+
             messages.success(request, f'Account created for {username}!')
 
             login(request, user)
